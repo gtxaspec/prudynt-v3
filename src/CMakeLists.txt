@@ -3,3 +3,6 @@ set(WYZEDOM_SOURCE
 )
 
 add_executable(${PROJECT_NAME} ${WYZEDOM_SOURCE})
+target_include_directories(${PROJECT_NAME} PUBLIC ../blob/include)
+target_link_directories(${PROJECT_NAME} PUBLIC ../blob/lib)
+target_link_libraries(${PROJECT_NAME} imp alog rt)
