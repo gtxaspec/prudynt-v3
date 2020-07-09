@@ -1,5 +1,8 @@
 set(WYZEDOM_SOURCE
   main.cpp
+  Encoder.cpp
+  Logger.cpp
+  FrameWaterfall.cpp
 )
 
 add_executable(${PROJECT_NAME} ${WYZEDOM_SOURCE})
