@@ -114,8 +114,11 @@ int Encoder::framesource_init() {
 int Encoder::encoder_init() {
     int ret = 0;
 
+    IMPEncoderRcAttr *rc_attr;
     IMPEncoderCHNAttr channel_attr;
     memset(&channel_attr, 0, sizeof(IMPEncoderCHNAttr));
+    rc_attr = &channel_attr.rcAttr;
+
     channel_attr.encAttr.enType = PT_H264;
     channel_attr.encAttr.bufSize = 0;
     channel_attr.encAttr.profile = 1;
@@ -131,25 +134,25 @@ int Encoder::encoder_init() {
     //slower rate. A sufficiently low value can cause the frame emission rate to
     //drop below the frame rate. I assume the encoder is spitting out multiple
     //frames in each stream when that happens.
-    channel_attr.rcAttr.maxGop = 48;
-    channel_attr.rcAttr.attrRcMode.rcMode = ENC_RC_MODE_SMART;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.maxQp = 45;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.minQp = 15;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.staticTime = 2;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.maxBitRate = (double)5000.0;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.iBiasLvl = 0;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.changePos = 80;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.qualityLvl = 2;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.frmQPStep = 3;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.gopQPStep = 15;
-    channel_attr.rcAttr.attrRcMode.attrH264Smart.gopRelation = false;
-    channel_attr.rcAttr.attrHSkip.hSkipAttr.skipType = IMP_Encoder_STYPE_N4X;
-    channel_attr.rcAttr.attrHSkip.hSkipAttr.m = channel_attr.rcAttr.maxGop - 1;
-    channel_attr.rcAttr.attrHSkip.hSkipAttr.n = 1;
-    channel_attr.rcAttr.attrHSkip.hSkipAttr.maxSameSceneCnt = 6;
-    channel_attr.rcAttr.attrHSkip.hSkipAttr.bEnableScenecut = 0;
-    channel_attr.rcAttr.attrHSkip.hSkipAttr.bBlackEnhance = 0;
-    channel_attr.rcAttr.attrHSkip.maxHSkipType = IMP_Encoder_STYPE_N4X;
+    rc_attr->maxGop = 48;
+    rc_attr->attrRcMode.rcMode = ENC_RC_MODE_SMART;
+    rc_attr->attrRcMode.attrH264Smart.maxQp = 45;
+    rc_attr->attrRcMode.attrH264Smart.minQp = 15;
+    rc_attr->attrRcMode.attrH264Smart.staticTime = 2;
+    rc_attr->attrRcMode.attrH264Smart.maxBitRate = (unsigned int)5000;
+    rc_attr->attrRcMode.attrH264Smart.iBiasLvl = 0;
+    rc_attr->attrRcMode.attrH264Smart.changePos = 80;
+    rc_attr->attrRcMode.attrH264Smart.qualityLvl = 2;
+    rc_attr->attrRcMode.attrH264Smart.frmQPStep = 3;
+    rc_attr->attrRcMode.attrH264Smart.gopQPStep = 15;
+    rc_attr->attrRcMode.attrH264Smart.gopRelation = false;
+    rc_attr->attrHSkip.hSkipAttr.skipType = IMP_Encoder_STYPE_N4X;
+    rc_attr->attrHSkip.hSkipAttr.m = rc_attr->maxGop - 1;
+    rc_attr->attrHSkip.hSkipAttr.n = 1;
+    rc_attr->attrHSkip.hSkipAttr.maxSameSceneCnt = 6;
+    rc_attr->attrHSkip.hSkipAttr.bEnableScenecut = 0;
+    rc_attr->attrHSkip.hSkipAttr.bBlackEnhance = 0;
+    rc_attr->attrHSkip.maxHSkipType = IMP_Encoder_STYPE_N4X;
 
     ret = IMP_Encoder_CreateChn(0, &channel_attr);
     if (ret < 0) {
