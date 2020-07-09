@@ -49,6 +49,16 @@ IMPFSChnAttr Encoder::create_fs_attr() {
 int Encoder::system_init() {
     int ret = 0;
 
+    //If you are having problems with video quality, please make
+    //sure you are linking against the new version of libimp.
+    //The version in /system/lib, IMP-3.11.0, is old.
+    //If you see IMP-3.11.0 or lower, expect bad video
+    //quality and other bugs.
+    //Version IMP-3.12.0 works well in my experience.
+    IMPVersion version;
+    ret = IMP_System_GetVersion(&version);
+    LOG(MODULE, "IMP Library Version " << version.aVersion);
+
     ret = IMP_ISP_Open();
     if (ret < 0) {
         LOG(MODULE, "Error: IMP_ISP_Open() == " << ret);
