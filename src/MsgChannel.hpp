@@ -10,8 +10,9 @@
 
 template <class T> class MsgChannel {
 public:
-    MsgChannel() : write_ptr(0), read_ptr(0) {
-        msg_buffer.resize(100);
+    MsgChannel(unsigned int bsize) : write_ptr(0), read_ptr(0) {
+        msg_buffer.resize(bsize);
+        buffer_size = bsize;
     }
 
     void write(T msg) {
@@ -70,11 +71,11 @@ private:
     }
 
     void increment_read() {
-        read_ptr = (read_ptr + 1) % 100;
+        read_ptr = (read_ptr + 1) % buffer_size;
     }
 
     void increment_write() {
-        write_ptr = (write_ptr + 1) % 100;
+        write_ptr = (write_ptr + 1) % buffer_size;
     }
 
     std::vector<T> msg_buffer;
@@ -82,6 +83,7 @@ private:
     std::atomic<int> read_ptr;
     std::mutex cv_mtx;
     std::condition_variable write_cv;
+    unsigned int buffer_size;
 };
 
 #endif
