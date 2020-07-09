@@ -16,16 +16,16 @@ int main(int argc, const char *argv[]) {
     std::shared_ptr<FrameWaterfall> frw = std::make_shared<FrameWaterfall>();
 
     //Logging channels
-    std::shared_ptr<MsgChannel<LogMsg>> enc_log_chn = std::make_shared<MsgChannel<LogMsg>>();
+    std::shared_ptr<MsgChannel<LogMsg>> enc_log_chn = std::make_shared<MsgChannel<LogMsg>>(20);
     log->add_sender(enc_log_chn);
     enc->set_logger(enc_log_chn);
 
-    std::shared_ptr<MsgChannel<LogMsg>> frw_log_chn = std::make_shared<MsgChannel<LogMsg>>();
+    std::shared_ptr<MsgChannel<LogMsg>> frw_log_chn = std::make_shared<MsgChannel<LogMsg>>(20);
     log->add_sender(frw_log_chn);
     frw->set_logger(frw_log_chn);
 
     //Encoder emits frames and sends them to the waterfall.
-    std::shared_ptr<MsgChannel<H264Frame>> enc_waterfall_chn = std::make_shared<MsgChannel<H264Frame>>();
+    std::shared_ptr<MsgChannel<H264Frame>> enc_waterfall_chn = std::make_shared<MsgChannel<H264Frame>>(10);
     frw->set_encoder(enc_waterfall_chn);
     enc->set_waterfall(enc_waterfall_chn);
 
