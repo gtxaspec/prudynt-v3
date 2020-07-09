@@ -9,7 +9,7 @@ set(CMAKE_CXX_COMPILER ${tools}/bin/mips-linux-uclibc-gnu-g++)
 
 aux_source_directory(./src SRC_LIST)
 
-set(CMAKE_CXX_FLAGS "--std=c++11 -g -Wall -Wextra -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "--std=c++11 -Wall -Wextra -Wno-unused-parameter -O3")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_subdirectory(./src)
