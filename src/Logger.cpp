@@ -15,7 +15,7 @@ void Logger::run() {
             LogMsg j;
             if (log_senders[i]->read(&j))
                 log(j);
-            usleep(2000);
+            usleep(5000);
         }
     }
 }
