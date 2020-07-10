@@ -19,11 +19,11 @@ echo "Build live555"
 cd 3rdparty/live
 make distclean
 ./genMakefiles wyze
-make -j$(nproc)
-make install
+PRUDYNT_ROOT="$TOP" make -j$(nproc)
+PRUDYNT_ROOT="$TOP" make install
 cd ../../
 
-echo "Build wyzedom"
+echo "Build prudynt"
 rm -rf build
 mkdir build
 cd build
