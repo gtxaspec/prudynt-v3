@@ -226,13 +226,9 @@ void Encoder::run() {
 
     IMP_Encoder_StartRecvPic(0);
     while (true) {
-        if (IMP_Encoder_PollingStream(0, 1000)  != 0) {
-            continue;
-        }
-
         IMPEncoderStream stream;
 
-        if (IMP_Encoder_GetStream(0, &stream, 0) != 0) {
+        if (IMP_Encoder_GetStream(0, &stream, true) != 0) {
             LOG(MODULE, "IMP_Encoder_GetStream() == " << ret);
             break;
         }
