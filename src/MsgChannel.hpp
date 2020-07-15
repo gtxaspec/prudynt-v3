@@ -30,6 +30,7 @@ public:
     bool read(T *out) {
         if (can_read()) {
             *out = msg_buffer[read_ptr];
+            msg_buffer[read_ptr] = T();
             increment_read();
             return true;
         }
@@ -42,6 +43,7 @@ public:
             write_cv.wait(lck);
         };
         T val = msg_buffer[read_ptr];
+        msg_buffer[read_ptr] = T();
         increment_read();
         return val;
     }
