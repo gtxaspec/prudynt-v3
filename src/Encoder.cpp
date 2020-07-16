@@ -136,6 +136,12 @@ int Encoder::encoder_init() {
 
     channel_attr.encAttr.enType = PT_H264;
     channel_attr.encAttr.bufSize = 0;
+    //0 = Baseline
+    //1 = Main
+    //2 = High
+    //Note: The encoder seems to emit frames at half the
+    //requested framerate when the profile is set to Baseline.
+    //For this reason, Main or High are recommended.
     channel_attr.encAttr.profile = 1;
     channel_attr.encAttr.picWidth = 1920;
     channel_attr.encAttr.picHeight = 1080;
