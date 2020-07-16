@@ -7,6 +7,7 @@
 #include <imp/imp_osd.h>
 
 #define MODULE "ENCODER"
+#define FRAME_RATE 12
 
 #include "Encoder.hpp"
 
@@ -34,7 +35,7 @@ IMPFSChnAttr Encoder::create_fs_attr() {
     IMPFSChnAttr out;
     memset(&out, 0, sizeof(IMPFSChnAttr));
     out.pixFmt = PIX_FMT_NV12;
-    out.outFrmRateNum = 12;
+    out.outFrmRateNum = FRAME_RATE;
     out.outFrmRateDen = 1;
     out.nrVBs = 2;
     out.type = FS_PHY_CHANNEL;
@@ -102,7 +103,7 @@ int Encoder::system_init() {
         return ret;
     }
 
-    ret = IMP_ISP_Tuning_SetSensorFPS(12, 1);
+    ret = IMP_ISP_Tuning_SetSensorFPS(FRAME_RATE, 1);
 
     return ret;
 }
