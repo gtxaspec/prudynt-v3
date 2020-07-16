@@ -10,6 +10,11 @@
 
 #include "Encoder.hpp"
 
+extern "C" {
+    extern int IMP_OSD_SetPoolSize(int newPoolSize);
+    extern int IMP_Encoder_SetPoolSize(int newPoolSize0);
+}
+
 Encoder::Encoder() {}
 
 IMPSensorInfo Encoder::create_sensor_info(std::string sensor) {
@@ -182,6 +187,8 @@ int Encoder::encoder_init() {
 void Encoder::run() {
     int ret = 0;
     LOG(MODULE, "Encoder Start.");
+
+    IMP_Encoder_SetPoolSize(0x100000);
 
     ret = system_init();
     if (ret < 0) {
