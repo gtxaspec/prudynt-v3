@@ -242,6 +242,20 @@ void Encoder::run() {
 
         H264Frame frame;
         for (unsigned int i = 0; i < stream.packCount; ++i) {
+#if 0
+            if ((H264NALType)stream.pack[i].dataType.h264Type == H264_NAL_SPS) {
+                //Baseline profile fix
+                //Because the encoder outputs frames at 1/2 the requested frame
+                //rate in Baseline mode, we need to double the framerate we
+                //request. Unfortunately this means the encoder will produce
+                //SPS NALs containing the incorrect (doubled) frame rate.
+                //We fix this by dividing the SPS rate by 2.
+
+                //XXX: We should parse the SPS rather than rely on the rate
+                //always being at +24.
+                *((uint8_t*)stream.pack[i].virAddr + 24) /= 2;
+            }
+#endif
             frame.data.insert(
                 frame.data.end(),
                 (uint8_t*)stream.pack[i].virAddr,
