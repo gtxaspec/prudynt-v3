@@ -147,10 +147,8 @@ int Encoder::encoder_init() {
     channel_attr.encAttr.picWidth = 1920;
     channel_attr.encAttr.picHeight = 1080;
 
-    //For some reason setting these values to anything other
-    //than their default of zero causes channel creation to fail.
-    //channel_attr.rcAttr.outFrmRate.frmRateNum = 12;
-    //channel_attr.rcAttr.outFrmRate.frmRateDen = 1;
+    channel_attr.rcAttr.outFrmRate.frmRateNum = FRAME_RATE;
+    channel_attr.rcAttr.outFrmRate.frmRateDen = 1;
 
     //Setting maxGop to a low value causes the encoder to emit frames at a much
     //slower rate. A sufficiently low value can cause the frame emission rate to
