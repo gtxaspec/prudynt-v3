@@ -152,7 +152,7 @@ int Encoder::encoder_init() {
     rc_attr->attrRcMode.attrH264Smart.maxBitRate = (unsigned int)5000;
     rc_attr->attrRcMode.attrH264Smart.iBiasLvl = 0;
     rc_attr->attrRcMode.attrH264Smart.changePos = 80;
-    rc_attr->attrRcMode.attrH264Smart.qualityLvl = 2;
+    rc_attr->attrRcMode.attrH264Smart.qualityLvl = 0;
     rc_attr->attrRcMode.attrH264Smart.frmQPStep = 3;
     rc_attr->attrRcMode.attrH264Smart.gopQPStep = 15;
     rc_attr->attrRcMode.attrH264Smart.gopRelation = false;
