@@ -4,7 +4,7 @@ set -e
 TOP=$(pwd)
 echo "TOP = $TOP"
 
-rm -r 3rdparty/install
+rm -rf 3rdparty/install
 mkdir 3rdparty/install
 
 echo "Build OpenSSL"
