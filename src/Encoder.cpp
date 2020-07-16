@@ -36,7 +36,7 @@ IMPFSChnAttr Encoder::create_fs_attr() {
     out.pixFmt = PIX_FMT_NV12;
     out.outFrmRateNum = 12;
     out.outFrmRateDen = 1;
-    out.nrVBs = 1;
+    out.nrVBs = 2;
     out.type = FS_PHY_CHANNEL;
     out.crop.enable = 0;
     out.crop.top = 0;
