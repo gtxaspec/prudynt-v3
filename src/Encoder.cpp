@@ -153,9 +153,9 @@ int Encoder::encoder_init() {
 
     //Setting maxGop to a low value causes the encoder to emit frames at a much
     //slower rate. A sufficiently low value can cause the frame emission rate to
-    //drop below the frame rate. I assume the encoder is spitting out multiple
-    //frames in each stream when that happens.
-    rc_attr->maxGop = 48;
+    //drop below the frame rate.
+    //I find that 2x the frame rate is a good setting.
+    rc_attr->maxGop = FRAME_RATE * 2;
     rc_attr->attrRcMode.rcMode = ENC_RC_MODE_SMART;
     rc_attr->attrRcMode.attrH264Smart.maxQp = 45;
     rc_attr->attrRcMode.attrH264Smart.minQp = 15;
