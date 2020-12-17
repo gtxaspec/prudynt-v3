@@ -3,9 +3,8 @@ project(prudynt)
 
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR mips)
-set(tools ${PROJECT_SOURCE_DIR}/toolchain)
-set(CMAKE_C_COMPILER ${tools}/bin/mips-linux-uclibc-gnu-gcc)
-set(CMAKE_CXX_COMPILER ${tools}/bin/mips-linux-uclibc-gnu-g++)
+set(CMAKE_C_COMPILER ${PRUDYNT_CROSS}gcc)
+set(CMAKE_CXX_COMPILER ${PRUDYNT_CROSS}g++)
 
 aux_source_directory(./src SRC_LIST)
 

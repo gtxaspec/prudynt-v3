@@ -1,5 +1,5 @@
-CROSS_COMPILE=          $(PRUDYNT_ROOT)/toolchain/bin/mips-linux-uclibc-gnu-
-COMPILE_OPTS =		$(INCLUDES) -L$(PRUDYNT_ROOT)/3rdparty/install/lib/ -I$(PRUDYNT_ROOT)/3rdparty/install/include -I. -O2 -DSOCKLEN_T=socklen_t -DUCLINUX -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DNEWLOCALE_NOT_USED
+CROSS_COMPILE=          $(PRUDYNT_CROSS)
+COMPILE_OPTS =		$(INCLUDES) -L$(PRUDYNT_ROOT)/3rdparty/install/lib/ -I$(PRUDYNT_ROOT)/3rdparty/install/include -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DNEWLOCALE_NOT_USED
 PREFIX = $(PRUDYNT_ROOT)/3rdparty/install/
 C =			c
 C_COMPILER =		$(CROSS_COMPILE)gcc

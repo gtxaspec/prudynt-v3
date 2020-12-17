@@ -19,6 +19,7 @@ target_link_directories(${PROJECT_NAME} PUBLIC
   ../blob/lib
 )
 target_link_libraries(${PROJECT_NAME}
+  pthread
   imp alog rt crypto ssl
   liveMedia
   groupsock
