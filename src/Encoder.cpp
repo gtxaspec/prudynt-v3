@@ -253,6 +253,17 @@ void Encoder::run() {
 
         H264Frame frame;
         for (unsigned int i = 0; i < stream.packCount; ++i) {
+            //Write NRI bits to match RFC6184
+            //Not sure if this survives live555, but can't hurt
+            if (stream.pack[i].dataType.h264Type == 7 ||
+                stream.pack[i].dataType.h264Type == 8 ||
+                stream.pack[i].dataType.h264Type == 5) {
+                start[4] |= 0x60; // NRI 11
+            }
+            if (stream.pack[i].dataType.h264Type == 1) {
+                start[4] |= 0x40; // NRI 10
+            }
+
 #if 0
             if ((H264NALType)stream.pack[i].dataType.h264Type == H264_NAL_SPS) {
                 //Baseline profile fix
