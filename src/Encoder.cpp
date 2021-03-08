@@ -34,6 +34,12 @@ IMPSensorInfo Encoder::create_sensor_info(std::string sensor) {
 IMPFSChnAttr Encoder::create_fs_attr() {
     IMPFSChnAttr out;
     memset(&out, 0, sizeof(IMPFSChnAttr));
+
+    //Seems to only support the following (channel enable fails otherwise)
+    //PIX_FMT_YUYV422
+    //PIX_FMT_UYVY422
+    //PIX_FMT_NV12
+    //Of those, I have only gotten PIX_FMT_NV12 to produce frames.
     out.pixFmt = PIX_FMT_NV12;
     out.outFrmRateNum = FRAME_RATE;
     out.outFrmRateDen = 1;
