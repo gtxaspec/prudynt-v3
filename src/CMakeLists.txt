@@ -2,7 +2,6 @@ set(WYZEDOM_SOURCE
   main.cpp
   Encoder.cpp
   Logger.cpp
-  FrameWaterfall.cpp
   RTSP.cpp
   IMPServerMediaSubsession.cpp
   IMPDeviceSource.cpp

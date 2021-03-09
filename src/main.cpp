@@ -3,7 +3,6 @@
 
 #include "MsgChannel.hpp"
 #include "Encoder.hpp"
-#include "FrameWaterfall.hpp"
 #include "RTSP.hpp"
 #include "Logger.hpp"
 
