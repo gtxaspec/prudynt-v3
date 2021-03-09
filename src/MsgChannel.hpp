@@ -67,7 +67,7 @@ private:
     }
 
     bool can_write() {
-        if (write_ptr == read_ptr - 1) {
+        if (((write_ptr + 1) % buffer_size) == read_ptr) {
             return false;
         }
         return true;
@@ -82,8 +82,8 @@ private:
     }
 
     std::vector<T> msg_buffer;
-    std::atomic<int> write_ptr;
-    std::atomic<int> read_ptr;
+    std::atomic<unsigned int> write_ptr;
+    std::atomic<unsigned int> read_ptr;
     std::mutex cv_mtx;
     std::condition_variable write_cv;
     unsigned int buffer_size;
