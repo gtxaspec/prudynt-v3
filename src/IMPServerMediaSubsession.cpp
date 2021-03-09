@@ -35,7 +35,7 @@ FramedSource* IMPServerMediaSubsession::createNewStreamSource(
     estBitrate = 5000;
     FramedSource *fs = replicator->createStreamReplica();
 
-    return H264VideoStreamDiscreteFramer::createNew(envir(), fs, true, true);
+    return H264VideoStreamDiscreteFramer::createNew(envir(), fs, true, false);
 }
 
 RTPSink *IMPServerMediaSubsession::createNewRTPSink(
