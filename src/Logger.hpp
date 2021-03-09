@@ -30,8 +30,11 @@ class Logger {
 public:
     Logger();
     void run();
-    void add_sender(std::shared_ptr<MsgChannel<LogMsg>> chn) {
+
+    template <class T> void connect(T *c) {
+        std::shared_ptr<MsgChannel<LogMsg>> chn = std::make_shared<MsgChannel<LogMsg>>(20);
         log_senders.push_back(chn);
+        c->set_logger(chn);
     }
 
 private:

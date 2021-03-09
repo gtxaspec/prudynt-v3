@@ -24,8 +24,10 @@ public:
         logger = chn;
     }
 
-    void set_waterfall(std::shared_ptr<MsgChannel<H264NALUnit>> chn) {
-        waterfall = chn;
+    template <class T> void connect_sink(T *c) {
+        std::shared_ptr<MsgChannel<H264NALUnit>> chn = std::make_shared<MsgChannel<H264NALUnit>>(10);
+        sinks.push_back(chn);
+        c->set_framesource(chn);
     }
 private:
     IMPSensorInfo create_sensor_info(std::string sensor);
@@ -34,7 +36,7 @@ private:
     int framesource_init();
     int encoder_init();
     std::shared_ptr<MsgChannel<LogMsg>> logger;
-    std::shared_ptr<MsgChannel<H264NALUnit>> waterfall;
+    std::vector<std::shared_ptr<MsgChannel<H264NALUnit>>> sinks;
     struct timeval imp_time_base;
 };
 

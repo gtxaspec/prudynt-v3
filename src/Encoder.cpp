@@ -304,7 +304,9 @@ void Encoder::run() {
             //'startcodes' at the beginning of each NAL. Live555 complains
             //if those are present.
             nalu.data.insert(nalu.data.end(), start+4, end);
-            waterfall->write(nalu);
+            for (unsigned int i = 0; i < sinks.size(); ++i) {
+                sinks[i]->write(nalu);
+            }
         }
         IMP_Encoder_ReleaseStream(0, &stream);
     }
