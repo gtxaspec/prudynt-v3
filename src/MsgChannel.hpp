@@ -15,15 +15,16 @@ public:
         buffer_size = bsize;
     }
 
-    void write(T msg) {
+    bool write(T msg) {
         if (can_write()) {
             std::unique_lock<std::mutex> lck(cv_mtx);
             msg_buffer[write_ptr] = msg;
             increment_write();
             write_cv.notify_all();
+            return true;
         }
         else {
-            std::cout << "Couldn't write!" << std::endl;
+            return false;
         }
     }
 
