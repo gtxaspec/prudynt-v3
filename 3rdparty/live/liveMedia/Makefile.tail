@@ -286,7 +286,7 @@ include/VorbisAudioRTPSink.hh:	include/AudioRTPSink.hh
 TheoraVideoRTPSink.$(CPP):	include/TheoraVideoRTPSink.hh include/Base64.hh include/VorbisAudioRTPSource.hh include/VorbisAudioRTPSink.hh
 include/TheoraVideoRTPSink.hh:	include/VideoRTPSink.hh
 RawVideoRTPSink.$(CPP):	include/RawVideoRTPSink.hh
-include/RawVideoRTPSink.hh:	include/VideoRTPSink.hh
+include/RawVideoRTPSink.hh:	include/VideoRTPSink.hh include/RawVideoFrameParameters.hh
 VP8VideoRTPSink.$(CPP):		include/VP8VideoRTPSink.hh
 include/VP8VideoRTPSink.hh:	include/VideoRTPSink.hh
 VP9VideoRTPSink.$(CPP):		include/VP9VideoRTPSink.hh

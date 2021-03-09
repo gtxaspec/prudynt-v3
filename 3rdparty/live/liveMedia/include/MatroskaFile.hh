@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2020 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2021 Live Networks, Inc.  All rights reserved.
 // A class that encapsulates a Matroska file.
 // C++ header
 
@@ -196,9 +196,12 @@ private:
   void removeTrack(unsigned trackNumber);
   void continueReading(); // called by a demuxed track to tell us that it has a pending read ("doGetNextFrame()")
   void seekToTime(double& seekNPT);
+  void pause();
 
   static void handleEndOfFile(void* clientData);
   void handleEndOfFile();
+
+  void resetState();
 
 private:
   MatroskaFile& fOurFile;

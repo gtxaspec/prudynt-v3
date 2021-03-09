@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
-// Copyright (c) 1996-2020, Live Networks, Inc.  All rights reserved
+// Copyright (c) 1996-2021, Live Networks, Inc.  All rights reserved
 // A test program that reads a VOB file
 // splits it into Audio (AC3) and Video (MPEG) Elementary Streams,
 // and streams both using RTP.
@@ -127,8 +127,12 @@ int main(int argc, char const** argv) {
   curInputFileName = inputFileNames;
 
   // Create 'groupsocks' for RTP and RTCP:
-  struct in_addr destinationAddress;
-  destinationAddress.s_addr = chooseRandomIPv4SSMAddress(*env);
+  struct sockaddr_storage destinationAddress;
+  destinationAddress.ss_family = AF_INET;
+  ((struct sockaddr_in&)destinationAddress).sin_addr.s_addr = chooseRandomIPv4SSMAddress(*env);
+  // Note: This is a multicast address.  If you wish instead to stream
+  // using unicast, then you should use the "testOnDemandRTSPServer"
+  // test program - not this test program - as a model.
 
   const unsigned short rtpPortNumAudio = 4444;
   const unsigned short rtcpPortNumAudio = rtpPortNumAudio+1;

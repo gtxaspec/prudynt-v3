@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
-// Copyright (c) 1996-2020, Live Networks, Inc.  All rights reserved
+// Copyright (c) 1996-2021, Live Networks, Inc.  All rights reserved
 // A test program that reads a MPEG-1 or 2 Program Stream file,
 // splits it into Audio and Video Elementary Streams,
 // and streams both using RTP
@@ -71,8 +71,10 @@ int main(int argc, char** argv) {
   const unsigned short rtcpPortNumVideo = rtpPortNumVideo+1;
   const unsigned char ttl = 7; // low, in case routers don't admin scope
 
-  struct in_addr destinationAddress;
-  destinationAddress.s_addr = our_inet_addr(destinationAddressStr);
+  NetAddressList destinationAddresses(destinationAddressStr);
+  struct sockaddr_storage destinationAddress;
+  copyAddress(destinationAddress, destinationAddresses.firstAddress());
+
   const Port rtpPortAudio(rtpPortNumAudio);
   const Port rtcpPortAudio(rtcpPortNumAudio);
   const Port rtpPortVideo(rtpPortNumVideo);
