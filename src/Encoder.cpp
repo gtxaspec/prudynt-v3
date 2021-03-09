@@ -305,7 +305,13 @@ void Encoder::run() {
             //if those are present.
             nalu.data.insert(nalu.data.end(), start+4, end);
             for (unsigned int i = 0; i < sinks.size(); ++i) {
-                sinks[i]->write(nalu);
+                while (!sinks[i]->write(nalu)) {
+                    //Discard old NALUs if our sinks aren't keeping up.
+                    //This prevents the MsgChannels from clogging up with
+                    //old data.
+                    H264NALUnit old_nal;
+                    sinks[i]->read(&old_nal);
+                }
             }
         }
         IMP_Encoder_ReleaseStream(0, &stream);
