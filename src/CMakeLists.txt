@@ -3,6 +3,9 @@ set(WYZEDOM_SOURCE
   Encoder.cpp
   Logger.cpp
   FrameWaterfall.cpp
+  RTSP.cpp
+  IMPServerMediaSubsession.cpp
+  IMPDeviceSource.cpp
 )
 
 add_executable(${PROJECT_NAME} ${WYZEDOM_SOURCE})
