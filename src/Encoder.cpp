@@ -5,6 +5,7 @@
 #include <imp/imp_common.h>
 #include <imp/imp_encoder.h>
 #include <imp/imp_osd.h>
+#include <ctime>
 
 #define MODULE "ENCODER"
 #define FRAME_RATE 12
@@ -242,6 +243,14 @@ void Encoder::run() {
 
     LOG(MODULE, "ISP setup complete, ready to capture frames.");
 
+    //The encoder tracks NAL timestamps with an int64_t.
+    //INT64_MAX = 9,223,372,036,854,775,807
+    //That means the encoder won't overflow its timestamp unless
+    //this program is left running for more than 106,751,991 days,
+    //or nearly 300,000 years. I think it's okay if we don't
+    //handle timestamp overflows. :)
+    IMP_System_RebaseTimeStamp(0);
+    gettimeofday(&imp_time_base, NULL);
     IMP_Encoder_StartRecvPic(0);
     while (true) {
         IMPEncoderStream stream;
@@ -251,8 +260,18 @@ void Encoder::run() {
             break;
         }
 
-        H264Frame frame;
+        //The I/P NAL is always last, but it doesn't
+        //really matter which NAL we select here as they
+        //all have identical timestamps.
+        int64_t nal_ts = stream.pack[stream.packCount - 1].timestamp;
+        struct timeval encode_time;
+        encode_time.tv_sec  = nal_ts / 1000000;
+        encode_time.tv_usec = nal_ts % 1000000;
+
         for (unsigned int i = 0; i < stream.packCount; ++i) {
+            uint8_t* start = (uint8_t*)stream.pack[i].virAddr;
+            uint8_t* end = (uint8_t*)stream.pack[i].virAddr + stream.pack[i].length;
+
             //Write NRI bits to match RFC6184
             //Not sure if this survives live555, but can't hurt
             if (stream.pack[i].dataType.h264Type == 7 ||
@@ -278,14 +297,15 @@ void Encoder::run() {
                 *((uint8_t*)stream.pack[i].virAddr + 24) /= 2;
             }
 #endif
-            frame.data.insert(
-                frame.data.end(),
-                (uint8_t*)stream.pack[i].virAddr,
-                (uint8_t*)stream.pack[i].virAddr + stream.pack[i].length
-            );
-        }
-        waterfall->write(frame);
 
+            H264NALUnit nalu;
+            timeradd(&imp_time_base, &encode_time, &nalu.time);
+            //We use start+4 because the encoder inserts 4-byte MPEG
+            //'startcodes' at the beginning of each NAL. Live555 complains
+            //if those are present.
+            nalu.data.insert(nalu.data.end(), start+4, end);
+            waterfall->write(nalu);
+        }
         IMP_Encoder_ReleaseStream(0, &stream);
     }
     IMP_Encoder_StopRecvPic(0);

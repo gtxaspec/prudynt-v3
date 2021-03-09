@@ -12,7 +12,7 @@ public:
     FrameWaterfall() {};
     void run();
 
-    void set_encoder(std::shared_ptr<MsgChannel<H264Frame>> chn) {
+    void set_encoder(std::shared_ptr<MsgChannel<H264NALUnit>> chn) {
         encoder = chn;
     }
 
@@ -21,7 +21,7 @@ public:
     }
 private:
     std::shared_ptr<MsgChannel<LogMsg>> logger;
-    std::shared_ptr<MsgChannel<H264Frame>> encoder;
+    std::shared_ptr<MsgChannel<H264NALUnit>> encoder;
 };
 
 #endif
