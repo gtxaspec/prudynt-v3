@@ -8,17 +8,21 @@
 IMPServerMediaSubsession* IMPServerMediaSubsession::createNew(
     UsageEnvironment& env,
     StreamReplicator* rep,
-    bool reuseFirstSource
+    bool reuseFirstSource,
+    H264NALUnit sps,
+    H264NALUnit pps
 ) {
-    return new IMPServerMediaSubsession(env, rep, reuseFirstSource);
+    return new IMPServerMediaSubsession(env, rep, reuseFirstSource, sps, pps);
 }
 
 IMPServerMediaSubsession::IMPServerMediaSubsession(
     UsageEnvironment& env,
     StreamReplicator* rep,
-    bool reuseFirstSource)
+    bool reuseFirstSource,
+    H264NALUnit sps,
+    H264NALUnit pps)
     : OnDemandServerMediaSubsession(env, reuseFirstSource),
-      replicator(rep)
+      replicator(rep), sps(sps), pps(pps)
 {
 
 }
@@ -47,6 +51,10 @@ RTPSink *IMPServerMediaSubsession::createNewRTPSink(
     return H264VideoRTPSink::createNew(
         envir(),
         rtpGroupsock,
-        rtpPayloadTypeIfDynamic
+        rtpPayloadTypeIfDynamic,
+        &sps.data[0],
+        sps.data.size(),
+        &pps.data[0],
+        pps.data.size()
     );
 }

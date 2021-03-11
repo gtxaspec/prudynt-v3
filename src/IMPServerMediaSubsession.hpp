@@ -4,19 +4,24 @@
 #include "StreamReplicator.hh"
 #include "ServerMediaSession.hh"
 #include "OnDemandServerMediaSubsession.hh"
+#include "Encoder.hpp"
 
 class IMPServerMediaSubsession: public OnDemandServerMediaSubsession {
 public:
     static IMPServerMediaSubsession* createNew(
         UsageEnvironment& env,
         StreamReplicator *rep,
-        bool reuseFirstSource
+        bool reuseFirstSource,
+        H264NALUnit sps,
+        H264NALUnit pps
     );
 protected:
     IMPServerMediaSubsession(
         UsageEnvironment& env,
         StreamReplicator *rep,
-        bool reuseFirstSource
+        bool reuseFirstSource,
+        H264NALUnit sps,
+        H264NALUnit pps
     );
     virtual ~IMPServerMediaSubsession();
 
@@ -33,6 +38,7 @@ protected:
 
 private:
     StreamReplicator *replicator;
+    H264NALUnit sps, pps;
 };
 
 #endif
