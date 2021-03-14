@@ -10,7 +10,6 @@ class IMPServerMediaSubsession: public OnDemandServerMediaSubsession {
 public:
     static IMPServerMediaSubsession* createNew(
         UsageEnvironment& env,
-        StreamReplicator *rep,
         bool reuseFirstSource,
         H264NALUnit sps,
         H264NALUnit pps
@@ -18,7 +17,6 @@ public:
 protected:
     IMPServerMediaSubsession(
         UsageEnvironment& env,
-        StreamReplicator *rep,
         bool reuseFirstSource,
         H264NALUnit sps,
         H264NALUnit pps

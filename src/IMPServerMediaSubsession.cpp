@@ -7,22 +7,20 @@
 
 IMPServerMediaSubsession* IMPServerMediaSubsession::createNew(
     UsageEnvironment& env,
-    StreamReplicator* rep,
     bool reuseFirstSource,
     H264NALUnit sps,
     H264NALUnit pps
 ) {
-    return new IMPServerMediaSubsession(env, rep, reuseFirstSource, sps, pps);
+    return new IMPServerMediaSubsession(env, reuseFirstSource, sps, pps);
 }
 
 IMPServerMediaSubsession::IMPServerMediaSubsession(
     UsageEnvironment& env,
-    StreamReplicator* rep,
     bool reuseFirstSource,
     H264NALUnit sps,
     H264NALUnit pps)
     : OnDemandServerMediaSubsession(env, reuseFirstSource),
-      replicator(rep), sps(sps), pps(pps)
+      sps(sps), pps(pps)
 {
 
 }
@@ -37,9 +35,9 @@ FramedSource* IMPServerMediaSubsession::createNewStreamSource(
 ) {
     std::cout << "Create Stream Source." << std::endl;
     estBitrate = 5000;
-    FramedSource *fs = replicator->createStreamReplica();
 
-    return H264VideoStreamDiscreteFramer::createNew(envir(), fs, true, false);
+    IMPDeviceSource *imp = IMPDeviceSource::createNew(envir());
+    return H264VideoStreamDiscreteFramer::createNew(envir(), imp, false, false);
 }
 
 RTPSink *IMPServerMediaSubsession::createNewRTPSink(

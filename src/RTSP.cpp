@@ -18,6 +18,7 @@ void RTSP::run() {
     }
     OutPacketBuffer::maxSize = 500000;
 
+    int sink_id = Encoder::connect_sink(this);
     H264NALUnit sps, pps;
     bool have_pps = false, have_sps = false;
     //Read from the stream until we capture the SPS and PPS.
@@ -32,14 +33,13 @@ void RTSP::run() {
             have_pps = true;
         }
     }
+    Encoder::remove_sink(sink_id);
 
     ServerMediaSession *sms = ServerMediaSession::createNew(
         *env, "Main", "Main", "Wyzecam"
     );
-    IMPDeviceSource *imp = IMPDeviceSource::createNew(*env, encoder);
-    StreamReplicator *replicator = StreamReplicator::createNew(*env, imp, false);
     IMPServerMediaSubsession *sub = IMPServerMediaSubsession::createNew(
-        *env, replicator, true, sps, pps
+        *env, true, sps, pps
     );
     sms->addSubsession(sub);
     rtspServer->addServerMediaSession(sms);

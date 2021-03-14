@@ -18,6 +18,10 @@ extern "C" {
 }
 
 Encoder::Encoder() {}
+std::mutex Encoder::sinks_lock;
+std::map<uint32_t,EncoderSink> Encoder::sinks;
+uint32_t Encoder::sink_id = 0;
+
 
 IMPSensorInfo Encoder::create_sensor_info(std::string sensor) {
     IMPSensorInfo out;
@@ -304,13 +308,22 @@ void Encoder::run() {
             //'startcodes' at the beginning of each NAL. Live555 complains
             //if those are present.
             nalu.data.insert(nalu.data.end(), start+4, end);
-            for (unsigned int i = 0; i < sinks.size(); ++i) {
-                while (!sinks[i]->write(nalu)) {
-                    //Discard old NALUs if our sinks aren't keeping up.
-                    //This prevents the MsgChannels from clogging up with
-                    //old data.
-                    H264NALUnit old_nal;
-                    sinks[i]->read(&old_nal);
+
+            std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
+            for (std::map<uint32_t,EncoderSink>::iterator it=Encoder::sinks.begin();
+                 it != Encoder::sinks.end(); ++it) {
+                if (stream.pack[i].dataType.h264Type == 7) {
+                    LOG(MODULE, "deliver frame");
+                    it->second.IDR = true;
+                }
+                if (it->second.IDR) {
+                    while (!it->second.chn->write(nalu)) {
+                        //Discard old NALUs if our sinks aren't keeping up.
+                        //This prevents the MsgChannels from clogging up with
+                        //old data.
+                        H264NALUnit old_nal;
+                        it->second.chn->read(&old_nal);
+                    }
                 }
             }
         }

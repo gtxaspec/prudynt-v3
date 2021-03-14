@@ -2,23 +2,20 @@
 #include <iostream>
 #include "GroupsockHelper.hh"
 
-IMPDeviceSource* IMPDeviceSource::createNew(
-    UsageEnvironment& env,
-    std::shared_ptr<MsgChannel<H264NALUnit>> enc
-) {
-    return new IMPDeviceSource(env, enc);
+IMPDeviceSource* IMPDeviceSource::createNew(UsageEnvironment& env) {
+    return new IMPDeviceSource(env);
 }
 
-IMPDeviceSource::IMPDeviceSource(
-    UsageEnvironment& env,
-    std::shared_ptr<MsgChannel<H264NALUnit>> enc)
-    : FramedSource(env), encoder(enc)
+IMPDeviceSource::IMPDeviceSource(UsageEnvironment& env)
+    : FramedSource(env)
 {
     std::cout << "device source construct" << std::endl;
+    sink_id = Encoder::connect_sink(this);
 }
 
 IMPDeviceSource::~IMPDeviceSource() {
     std::cout << "device source destruct" << std::endl;
+    Encoder::remove_sink(sink_id);
 }
 
 void IMPDeviceSource::doGetNextFrame() {

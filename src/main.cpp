@@ -19,8 +19,6 @@ int main(int argc, const char *argv[]) {
     logger.connect(&enc);
     logger.connect(&rtsp);
 
-    //Encoder -> RTSP for broadcast
-    enc.connect_sink(&rtsp);
 
     std::thread log_thread(start_component<Logger>, logger);
     std::thread enc_thread(start_component<Encoder>, enc);
