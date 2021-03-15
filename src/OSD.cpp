@@ -230,10 +230,10 @@ void OSD::update() {
     //Called every frame by the encoder.
 
     //Update timestamp time
-    time_t time = time(NULL);
-    if (last_ts_time != time) {
-        last_ts_time = time;
-        struct tm *ltime = localtime(&time);
+    time_t current = time(NULL);
+    if (last_ts_time != current) {
+        last_ts_time = current;
+        struct tm *ltime = localtime(&current);
         char formatted[256];
         strftime(formatted, 256, "%I:%M:%S %p %m/%d/%Y", ltime);
         formatted[255] = '\0';
