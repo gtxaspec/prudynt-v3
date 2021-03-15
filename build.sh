@@ -16,7 +16,14 @@ make -j$(nproc) install
 cd ../../
 
 echo "Build freetype2"
-cd 3rdparty/freetype
+cd 3rdparty
+rm -rf freetype
+if [[ ! -f freetype-2.10.4.tar.xz ]]; then
+    wget 'https://download.savannah.gnu.org/releases/freetype/freetype-2.10.4.tar.xz'
+fi
+tar xvf freetype-2.10.4.tar.xz
+mv freetype-2.10.4 freetype
+cd freetype
 CC="${PRUDYNT_CROSS}gcc" ./configure --host mipsel-linux-gnu --prefix="$TOP/3rdparty/install/" --with-png=no --with-brotli=no --with-harfbuzz=no --with-zlib=no
 make -j$(nproc)
 make install
