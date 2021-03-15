@@ -1,2 +1,5 @@
 build/
+3rdparty/install
+3rdparty/freetype
+3rdparty/freetype*.tar.xz
 
