@@ -39,7 +39,7 @@ void RTSP::run() {
         *env, "Main", "Main", "Wyzecam"
     );
     IMPServerMediaSubsession *sub = IMPServerMediaSubsession::createNew(
-        *env, true, sps, pps
+        *env, sps, pps
     );
     sms->addSubsession(sub);
     rtspServer->addServerMediaSession(sms);

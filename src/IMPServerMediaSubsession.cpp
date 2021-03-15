@@ -7,19 +7,17 @@
 
 IMPServerMediaSubsession* IMPServerMediaSubsession::createNew(
     UsageEnvironment& env,
-    bool reuseFirstSource,
     H264NALUnit sps,
     H264NALUnit pps
 ) {
-    return new IMPServerMediaSubsession(env, reuseFirstSource, sps, pps);
+    return new IMPServerMediaSubsession(env, sps, pps);
 }
 
 IMPServerMediaSubsession::IMPServerMediaSubsession(
     UsageEnvironment& env,
-    bool reuseFirstSource,
     H264NALUnit sps,
     H264NALUnit pps)
-    : OnDemandServerMediaSubsession(env, reuseFirstSource),
+    : OnDemandServerMediaSubsession(env, false),
       sps(sps), pps(pps)
 {
 
