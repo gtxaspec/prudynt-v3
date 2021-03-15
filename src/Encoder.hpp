@@ -49,7 +49,6 @@ public:
         Encoder::sinks.erase(sinkid);
     }
 
-    }
 private:
     IMPSensorInfo create_sensor_info(std::string sensor);
     IMPFSChnAttr create_fs_attr();
