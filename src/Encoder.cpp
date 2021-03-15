@@ -154,7 +154,7 @@ int Encoder::encoder_init() {
     //Note: The encoder seems to emit frames at half the
     //requested framerate when the profile is set to Baseline.
     //For this reason, Main or High are recommended.
-    channel_attr.encAttr.profile = 1;
+    channel_attr.encAttr.profile = 2;
     channel_attr.encAttr.picWidth = 1920;
     channel_attr.encAttr.picHeight = 1080;
 
