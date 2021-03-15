@@ -17,11 +17,11 @@ extern "C" {
     extern int IMP_Encoder_SetPoolSize(int newPoolSize0);
 }
 
-Encoder::Encoder() {}
 std::mutex Encoder::sinks_lock;
 std::map<uint32_t,EncoderSink> Encoder::sinks;
 uint32_t Encoder::sink_id = 0;
 
+Encoder::Encoder() : osd() {}
 
 IMPSensorInfo Encoder::create_sensor_info(std::string sensor) {
     IMPSensorInfo out;
@@ -231,11 +231,25 @@ void Encoder::run() {
         return;
     }
 
+    ret = osd.init();
+    if (ret) {
+        LOG(MODULE, "OSD Init Failed");
+        return;
+    }
+
     IMPCell fs = { DEV_ID_FS, 0, 0 };
+    IMPCell osd_cell = { DEV_ID_OSD, 0, 0 };
     IMPCell enc = { DEV_ID_ENC, 0, 0 };
-    ret = IMP_System_Bind(&fs, &enc);
+    //Framesource -> OSD
+    ret = IMP_System_Bind(&fs, &osd_cell);
     if (ret < 0) {
-        LOG(MODULE, "IMP_System_Bind() == " << ret);
+        LOG(MODULE, "IMP_System_Bind(FS, OSD) == " << ret);
+        return;
+    }
+    //OSD -> Encoder
+    ret = IMP_System_Bind(&osd_cell, &enc);
+    if (ret < 0) {
+        LOG(MODULE, "IMP_System_Bind(OSD, ENC) == " << ret);
         return;
     }
 
@@ -327,6 +341,7 @@ void Encoder::run() {
                 }
             }
         }
+        osd.update();
         IMP_Encoder_ReleaseStream(0, &stream);
     }
     IMP_Encoder_StopRecvPic(0);

@@ -19,7 +19,6 @@ int main(int argc, const char *argv[]) {
     logger.connect(&enc);
     logger.connect(&rtsp);
 
-
     std::thread log_thread(start_component<Logger>, logger);
     std::thread enc_thread(start_component<Encoder>, enc);
     std::thread rtsp_thread(start_component<RTSP>, rtsp);

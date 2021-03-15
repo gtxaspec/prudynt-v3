@@ -15,6 +15,13 @@ make -j$(nproc) CC="${PRUDYNT_CROSS}gcc"
 make -j$(nproc) install
 cd ../../
 
+echo "Build freetype2"
+cd 3rdparty/freetype
+CC="${PRUDYNT_CROSS}gcc" ./configure --host mipsel-linux-gnu --prefix="$TOP/3rdparty/install/" --with-png=no --with-brotli=no --with-harfbuzz=no --with-zlib=no
+make -j$(nproc)
+make install
+cd ../../
+
 echo "Build live555"
 cd 3rdparty/live
 if [[ -f Makefile ]]; then

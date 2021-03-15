@@ -10,6 +10,7 @@
 
 #include "MsgChannel.hpp"
 #include "Logger.hpp"
+#include "OSD.hpp"
 
 struct H264NALUnit {
     std::vector<uint8_t> data;
@@ -50,6 +51,8 @@ public:
     }
 
 private:
+    OSD osd;
+
     IMPSensorInfo create_sensor_info(std::string sensor);
     IMPFSChnAttr create_fs_attr();
     int system_init();
