@@ -8,132 +8,87 @@
 #include <ctime>
 
 #define MODULE "ENCODER"
-#define FRAME_RATE 12
 
 #include "Encoder.hpp"
-
-extern "C" {
-    extern int IMP_OSD_SetPoolSize(int newPoolSize);
-    extern int IMP_Encoder_SetPoolSize(int newPoolSize0);
-}
 
 std::mutex Encoder::sinks_lock;
 std::map<uint32_t,EncoderSink> Encoder::sinks;
 uint32_t Encoder::sink_id = 0;
 
-Encoder::Encoder() : osd() {}
+Encoder::Encoder() {}
 
-IMPSensorInfo Encoder::create_sensor_info(std::string sensor) {
-    IMPSensorInfo out;
-    memset(&out, 0, sizeof(IMPSensorInfo));
-    //if (sensor.compare("jxf23") == 0) {
-        LOG(MODULE, "Choosing JXF23");
-        std::strcpy(out.name, "jxf23");
-        out.cbus_type = TX_SENSOR_CONTROL_INTERFACE_I2C;
-        std::strcpy(out.i2c.type, "jxf23");
-        out.i2c.addr = 0x40;
-        return out;
-    //}
-}
+bool Encoder::init() {
+    int ret = 0;
+    ret = IMP_Encoder_CreateGroup(0);
+    if (ret < 0) {
+        std::cout << "IMP_Encoder_CreateGroup() == " << ret << std::endl;
+        return true;
+    }
 
-IMPFSChnAttr Encoder::create_fs_attr() {
-    IMPFSChnAttr out;
-    memset(&out, 0, sizeof(IMPFSChnAttr));
+    ret = system_init();
+    if (ret < 0) {
+        std::cout << "system_init failed " << std::endl;
+    }
 
-    //Seems to only support the following (channel enable fails otherwise)
-    //PIX_FMT_YUYV422
-    //PIX_FMT_UYVY422
-    //PIX_FMT_NV12
-    //Of those, I have only gotten PIX_FMT_NV12 to produce frames.
-    out.pixFmt = PIX_FMT_NV12;
-    out.outFrmRateNum = FRAME_RATE;
-    out.outFrmRateDen = 1;
-    out.nrVBs = 3;
-    out.type = FS_PHY_CHANNEL;
-    out.crop.enable = 0;
-    out.crop.top = 0;
-    out.crop.left = 0;
-    out.crop.width = 1920;
-    out.crop.height = 1080;
-    out.scaler.enable = 0;
-    out.scaler.outwidth = 1920;
-    out.scaler.outheight = 1080;
-    out.picWidth = 1920;
-    out.picHeight = 1080;
-    return out;
+    ret = encoder_init();
+    if (ret < 0) {
+        std::cout << "Encoder Init Failed" << std::endl;
+        return true;
+    }
+
+    ret = osd.init();
+    if (ret) {
+        std::cout << "OSD Init Failed" << std::endl;
+        return true;
+    }
+
+    IMPCell fs = { DEV_ID_FS, 0, 0 };
+    IMPCell osd_cell = { DEV_ID_OSD, 0, 0 };
+    IMPCell enc = { DEV_ID_ENC, 0, 0 };
+    //Framesource -> OSD
+    ret = IMP_System_Bind(&fs, &osd_cell);
+    if (ret < 0) {
+        std::cout << "IMP_System_Bind(FS, OSD) == " << ret << std::endl;
+        return true;
+    }
+    //OSD -> Encoder
+    ret = IMP_System_Bind(&osd_cell, &enc);
+    if (ret < 0) {
+        std::cout << "IMP_System_Bind(OSD, ENC) == " << ret << std::endl;
+        return true;
+    }
+
+    ret = IMP_FrameSource_EnableChn(0);
+    if (ret < 0) {
+        std::cout << "IMP_FrameSource_EnableChn() == " << ret << std::endl;
+        return true;
+    }
+
+    return false;
 }
 
 int Encoder::system_init() {
     int ret = 0;
 
-    //If you are having problems with video quality, please make
-    //sure you are linking against the new version of libimp.
-    //The version in /system/lib, IMP-3.11.0, is old.
-    //If you see IMP-3.11.0 or lower, expect bad video
-    //quality and other bugs.
-    //Version IMP-3.12.0 works well in my experience.
-    IMPVersion version;
-    ret = IMP_System_GetVersion(&version);
-    LOG(MODULE, "IMP Library Version " << version.aVersion);
+    IMP_ISP_Tuning_SetWDRAttr(IMPISP_TUNING_OPS_MODE_ENABLE);
+    IMP_ISP_Tuning_SetAntiFogAttr(ANTIFOG_STRONG);
+    IMP_ISP_Tuning_SetAntiFlickerAttr(IMPISP_ANTIFLICKER_60HZ);
 
-    ret = IMP_ISP_Open();
-    if (ret < 0) {
-        LOG(MODULE, "Error: IMP_ISP_Open() == " << ret);
-        return ret;
-    }
-    LOG(MODULE, "ISP Opened");
+    set_day_mode(DAY_MODE_DAY);
 
-    IMPSensorInfo sinfo = create_sensor_info("jxf23");
-    ret = IMP_ISP_AddSensor(&sinfo);
-    if (ret < 0) {
-        LOG(MODULE, "Error: IMP_ISP_AddSensor() == " << ret);
-        return ret;
-    }
-    LOG(MODULE, "Sensor Added");
-
-    ret = IMP_ISP_EnableSensor();
-    if (ret < 0) {
-        LOG(MODULE, "Error: IMP_ISP_EnableSensor() == " << ret);
-        return ret;
-    }
-    LOG(MODULE, "Sensor Enabled");
-
-    ret = IMP_System_Init();
-    if (ret < 0) {
-        LOG(MODULE, "Error: IMP_System_Init() == " << ret);
-        return ret;
-    }
-    LOG(MODULE, "System Initialized");
-
-    //Enable tuning.
-    //This is necessary to customize the sensor's image output.
-    //Denoising, WDR, Night Mode, and FPS customization require this.
-    ret = IMP_ISP_EnableTuning();
-    if (ret < 0) {
-        LOG(MODULE, "ERROR: IMP_ISP_EnableTuning() == " << ret);
-        return ret;
-    }
-
-    ret = IMP_ISP_Tuning_SetSensorFPS(FRAME_RATE, 1);
-
-    return ret;
-}
-
-int Encoder::framesource_init() {
-    int ret = 0;
-
-    IMPFSChnAttr fs_chn_attr = create_fs_attr();
-    ret = IMP_FrameSource_CreateChn(0, &fs_chn_attr);
-    if (ret < 0) {
-        LOG(MODULE, "IMP_FrameSource_CreateChn() == " << ret);
-        return ret;
-    }
-
-    ret = IMP_FrameSource_SetChnAttr(0, &fs_chn_attr);
-    if (ret < 0) {
-        LOG(MODULE, "IMP_FrameSource_SetChnAttr() == " << ret);
-        return ret;
-    }
+    IMPISPDrcAttr drc;
+    IMP_ISP_Tuning_GetRawDRC(&drc);
+    std::cout << "drc: " << drc.mode << std::endl;
+    drc.mode = IMPISP_DRC_MANUAL;
+    drc.dval_min = 0x40;
+    drc.dval_max = 0xFF;
+    drc.slop_min = 0x40;
+    drc.slop_max = 0xFF;
+    drc.black_level = 0x0;
+    drc.white_level = 0xFFF;
+    drc.drc_strength = 0x0;
+    ret = IMP_ISP_Tuning_SetRawDRC(&drc);
+    std::cout << "drc: " << drc.mode << std::endl;
 
     return ret;
 }
@@ -217,79 +172,71 @@ int Encoder::encoder_init() {
 
     ret = IMP_Encoder_CreateChn(0, &channel_attr);
     if (ret < 0) {
-        LOG(MODULE, "IMP_Encoder_CreateChn() == " << ret);
+        std::cout << "IMP_Encoder_CreateChn() == " << ret << std::endl;
         return ret;
     }
 
     ret = IMP_Encoder_RegisterChn(0, 0);
     if (ret < 0) {
-        LOG(MODULE, "IMP_Encoder_RegisterChn() == " << ret);
+        std::cout << "IMP_Encoder_RegisterChn() == " << ret << std::endl;
         return ret;
     }
 
     return ret;
 }
 
+void Encoder::set_day_mode(DayMode mode) {
+    day_mode = mode;
+    if (day_mode == DAY_MODE_DAY) {
+        //Day mode sensor settings
+        IMP_ISP_Tuning_SetISPRunningMode(IMPISP_RUNNING_MODE_DAY);
+        IMP_ISP_Tuning_SetSceneMode(IMPISP_SCENE_MODE_LANDSCAPE);
+        IMP_ISP_Tuning_SetColorfxMode(IMPISP_COLORFX_MODE_VIVID);
+
+        IMP_ISP_Tuning_SetBrightness(128);
+        IMP_ISP_Tuning_SetSaturation(150);
+
+        //WAS manual 0x50
+        //IMO anything above 0x50 produces an unacceptable amount of
+        //ghosting.
+        IMPISPTemperDenoiseAttr temp;
+        temp.type = IMPISP_TEMPER_MANUAL;
+        temp.temper_strength = 0x50;
+        temp.tval_max = 0xFF;
+        temp.tval_min = 0x60;
+        IMP_ISP_Tuning_SetTemperDnsAttr(&temp);
+
+        //GPIO settings
+        //Enable IR filter
+        GPIO::write(26, 1);
+        GPIO::write(25, 0);
+        //Disable IR LEDs
+        GPIO::write(49, 0);
+    }
+    else {
+        //Night mode settings
+        IMP_ISP_Tuning_SetISPRunningMode(IMPISP_RUNNING_MODE_NIGHT);
+        IMP_ISP_Tuning_SetSceneMode(IMPISP_SCENE_MODE_LANDSCAPE);
+        IMP_ISP_Tuning_SetColorfxMode(IMPISP_COLORFX_MODE_BW);
+        //We want all the exposure we can get at night
+        //IMP_ISP_Tuning_SetAeComp(120);
+
+        IMPISPSinterDenoiseAttr noise;
+        noise.type = IMPISP_TUNING_OPS_TYPE_AUTO;
+        noise.enable = IMPISP_TUNING_OPS_MODE_ENABLE;
+        IMP_ISP_Tuning_SetSinterDnsAttr(&noise);
+
+        IMPISPTemperDenoiseAttr temp;
+        temp.type = IMPISP_TEMPER_RANGE;
+        temp.temper_strength = 0x80;
+        temp.tval_max = 0xFF;
+        temp.tval_min = 0x10;
+        IMP_ISP_Tuning_SetTemperDnsAttr(&temp);
+    }
+}
+
 void Encoder::run() {
-    int ret = 0;
     LOG(MODULE, "Encoder Start.");
-
-    IMP_Encoder_SetPoolSize(0x100000);
-
-    ret = system_init();
-    if (ret < 0) {
-        LOG(MODULE, "System Init Failed");
-        return;
-    }
-
-    ret = framesource_init();
-    if (ret < 0) {
-        LOG(MODULE, "Framesource Init Failed");
-        return;
-    }
-
-    IMP_ISP_Tuning_SetISPBypass(IMPISP_TUNING_OPS_MODE_ENABLE);
-    ret = IMP_Encoder_CreateGroup(0);
-    if (ret < 0) {
-        LOG(MODULE, "IMP_Encoder_CreateGroup() == " << ret);
-        return;
-    }
-
-    ret = encoder_init();
-    if (ret < 0) {
-        LOG(MODULE, "Encoder Init Failed");
-        return;
-    }
-
-    ret = osd.init();
-    if (ret) {
-        LOG(MODULE, "OSD Init Failed");
-        return;
-    }
-
-    IMPCell fs = { DEV_ID_FS, 0, 0 };
-    IMPCell osd_cell = { DEV_ID_OSD, 0, 0 };
-    IMPCell enc = { DEV_ID_ENC, 0, 0 };
-    //Framesource -> OSD
-    ret = IMP_System_Bind(&fs, &osd_cell);
-    if (ret < 0) {
-        LOG(MODULE, "IMP_System_Bind(FS, OSD) == " << ret);
-        return;
-    }
-    //OSD -> Encoder
-    ret = IMP_System_Bind(&osd_cell, &enc);
-    if (ret < 0) {
-        LOG(MODULE, "IMP_System_Bind(OSD, ENC) == " << ret);
-        return;
-    }
-
-    ret = IMP_FrameSource_EnableChn(0);
-    if (ret < 0) {
-        LOG(MODULE, "IMP_FrameSource_EnableChn() == " << ret);
-        return;
-    }
-
-    LOG(MODULE, "ISP setup complete, ready to capture frames.");
 
     //The encoder tracks NAL timestamps with an int64_t.
     //INT64_MAX = 9,223,372,036,854,775,807
@@ -304,7 +251,7 @@ void Encoder::run() {
         IMPEncoderStream stream;
 
         if (IMP_Encoder_GetStream(0, &stream, true) != 0) {
-            LOG(MODULE, "IMP_Encoder_GetStream() == " << ret);
+            LOG(MODULE, "IMP_Encoder_GetStream() failed");
             break;
         }
 

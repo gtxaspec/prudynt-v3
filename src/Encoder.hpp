@@ -6,6 +6,7 @@
 #include <map>
 #include <imp/imp_framesource.h>
 #include <imp/imp_system.h>
+#include <imp/imp_encoder.h>
 #include <imp/imp_isp.h>
 
 #include "MsgChannel.hpp"
@@ -25,6 +26,7 @@ struct EncoderSink {
 class Encoder {
 public:
     Encoder();
+    bool init();
     void run();
 
     static void flush() {
@@ -51,13 +53,18 @@ public:
     }
 
 private:
+    enum DayMode {
+        DAY_MODE_DAY,
+        DAY_MODE_NIGHT
+    };
+
     OSD osd;
 
-    IMPSensorInfo create_sensor_info(std::string sensor);
-    IMPFSChnAttr create_fs_attr();
+    DayMode day_mode;
     int system_init();
     int framesource_init();
     int encoder_init();
+    void set_day_mode(DayMode mode);
     std::shared_ptr<MsgChannel<LogMsg>> logger;
     static std::mutex sinks_lock;
     static uint32_t sink_id;
