@@ -326,8 +326,9 @@ void Encoder::run() {
             std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
             for (std::map<uint32_t,EncoderSink>::iterator it=Encoder::sinks.begin();
                  it != Encoder::sinks.end(); ++it) {
-                if (stream.pack[i].dataType.h264Type == 7) {
-                    LOG(MODULE, "deliver frame");
+                if (stream.pack[i].dataType.h264Type == 7 ||
+                    stream.pack[i].dataType.h264Type == 8 ||
+                    stream.pack[i].dataType.h264Type == 5) {
                     it->second.IDR = true;
                 }
                 if (it->second.IDR) {
