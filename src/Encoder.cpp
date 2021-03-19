@@ -166,18 +166,48 @@ int Encoder::encoder_init() {
     //drop below the frame rate.
     //I find that 2x the frame rate is a good setting.
     rc_attr->maxGop = FRAME_RATE * 2;
-    rc_attr->attrRcMode.rcMode = ENC_RC_MODE_SMART;
-    rc_attr->attrRcMode.attrH264Smart.maxQp = 45;
-    rc_attr->attrRcMode.attrH264Smart.minQp = 15;
-    rc_attr->attrRcMode.attrH264Smart.staticTime = 2;
-    rc_attr->attrRcMode.attrH264Smart.maxBitRate = (unsigned int)5000;
-    rc_attr->attrRcMode.attrH264Smart.iBiasLvl = 0;
-    rc_attr->attrRcMode.attrH264Smart.changePos = 80;
-    rc_attr->attrRcMode.attrH264Smart.qualityLvl = 0;
-    rc_attr->attrRcMode.attrH264Smart.frmQPStep = 3;
-    rc_attr->attrRcMode.attrH264Smart.gopQPStep = 15;
-    rc_attr->attrRcMode.attrH264Smart.gopRelation = false;
-    rc_attr->attrHSkip.hSkipAttr.skipType = IMP_Encoder_STYPE_N4X;
+    {
+        rc_attr->attrRcMode.rcMode = ENC_RC_MODE_SMART;
+        rc_attr->attrRcMode.attrH264Smart.maxQp = 40;
+        rc_attr->attrRcMode.attrH264Smart.minQp = 15;
+        rc_attr->attrRcMode.attrH264Smart.staticTime = 5;
+        rc_attr->attrRcMode.attrH264Smart.maxBitRate = 5000;
+        rc_attr->attrRcMode.attrH264Smart.iBiasLvl = 0;
+        rc_attr->attrRcMode.attrH264Smart.changePos = 50;
+        rc_attr->attrRcMode.attrH264Smart.qualityLvl = 0;
+        rc_attr->attrRcMode.attrH264Smart.frmQPStep = 3;
+        rc_attr->attrRcMode.attrH264Smart.gopQPStep = 15;
+        rc_attr->attrRcMode.attrH264Smart.gopRelation = true;
+    }
+    {
+        /*
+        rc_attr->attrRcMode.rcMode = ENC_RC_MODE_CBR;
+        rc_attr->attrRcMode.attrH264Cbr.maxQp = 40;
+        rc_attr->attrRcMode.attrH264Cbr.minQp = 20;
+        rc_attr->attrRcMode.attrH264Cbr.outBitRate = 5000;
+        rc_attr->attrRcMode.attrH264Cbr.iBiasLvl = 0;
+        rc_attr->attrRcMode.attrH264Cbr.frmQPStep = 3;
+        rc_attr->attrRcMode.attrH264Cbr.gopQPStep = 15;
+        rc_attr->attrRcMode.attrH264Cbr.adaptiveMode = true;
+        rc_attr->attrRcMode.attrH264Cbr.gopRelation = true;
+        */
+    }
+    {
+        /*
+        rc_attr->attrRcMode.rcMode = ENC_RC_MODE_VBR;
+        rc_attr->attrRcMode.attrH264Vbr.maxQp = 40;
+        rc_attr->attrRcMode.attrH264Vbr.minQp = 20;
+        rc_attr->attrRcMode.attrH264Vbr.staticTime = 5;
+        rc_attr->attrRcMode.attrH264Vbr.maxBitRate = 5000;
+        rc_attr->attrRcMode.attrH264Vbr.iBiasLvl = 0;
+        rc_attr->attrRcMode.attrH264Vbr.changePos = 50;
+        rc_attr->attrRcMode.attrH264Vbr.qualityLvl = 0;
+        rc_attr->attrRcMode.attrH264Vbr.frmQPStep = 3;
+        rc_attr->attrRcMode.attrH264Vbr.gopQPStep = 15;
+        rc_attr->attrRcMode.attrH264Vbr.gopRelation = true;
+        */
+    }
+    rc_attr->attrHSkip.hSkipAttr.skipType = IMP_Encoder_STYPE_HN1_TRUE;
     rc_attr->attrHSkip.hSkipAttr.m = rc_attr->maxGop - 1;
     rc_attr->attrHSkip.hSkipAttr.n = 1;
     rc_attr->attrHSkip.hSkipAttr.maxSameSceneCnt = 6;
