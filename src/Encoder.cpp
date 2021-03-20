@@ -21,24 +21,24 @@ bool Encoder::init() {
     int ret = 0;
     ret = IMP_Encoder_CreateGroup(0);
     if (ret < 0) {
-        std::cout << "IMP_Encoder_CreateGroup() == " << ret << std::endl;
+        LOG_ERROR("IMP_Encoder_CreateGroup() == " << ret);
         return true;
     }
 
     ret = system_init();
     if (ret < 0) {
-        std::cout << "system_init failed " << std::endl;
+        LOG_ERROR("system_init failed ");
     }
 
     ret = encoder_init();
     if (ret < 0) {
-        std::cout << "Encoder Init Failed" << std::endl;
+        LOG_ERROR("Encoder Init Failed");
         return true;
     }
 
     ret = osd.init();
     if (ret) {
-        std::cout << "OSD Init Failed" << std::endl;
+        LOG_ERROR("OSD Init Failed");
         return true;
     }
 
@@ -48,19 +48,19 @@ bool Encoder::init() {
     //Framesource -> OSD
     ret = IMP_System_Bind(&fs, &osd_cell);
     if (ret < 0) {
-        std::cout << "IMP_System_Bind(FS, OSD) == " << ret << std::endl;
+        LOG_ERROR("IMP_System_Bind(FS, OSD) == " << ret);
         return true;
     }
     //OSD -> Encoder
     ret = IMP_System_Bind(&osd_cell, &enc);
     if (ret < 0) {
-        std::cout << "IMP_System_Bind(OSD, ENC) == " << ret << std::endl;
+        LOG_ERROR("IMP_System_Bind(OSD, ENC) == " << ret);
         return true;
     }
 
     ret = IMP_FrameSource_EnableChn(0);
     if (ret < 0) {
-        std::cout << "IMP_FrameSource_EnableChn() == " << ret << std::endl;
+        LOG_ERROR("IMP_FrameSource_EnableChn() == " << ret);
         return true;
     }
 
@@ -172,13 +172,13 @@ int Encoder::encoder_init() {
 
     ret = IMP_Encoder_CreateChn(0, &channel_attr);
     if (ret < 0) {
-        std::cout << "IMP_Encoder_CreateChn() == " << ret << std::endl;
+        LOG_ERROR("IMP_Encoder_CreateChn() == " << ret);
         return ret;
     }
 
     ret = IMP_Encoder_RegisterChn(0, 0);
     if (ret < 0) {
-        std::cout << "IMP_Encoder_RegisterChn() == " << ret << std::endl;
+        LOG_ERROR("IMP_Encoder_RegisterChn() == " << ret);
         return ret;
     }
 
@@ -236,7 +236,7 @@ void Encoder::set_day_mode(DayMode mode) {
 }
 
 void Encoder::run() {
-    LOG(MODULE, "Encoder Start.");
+    LOG_INFO("Encoder Start.");
 
     //The encoder tracks NAL timestamps with an int64_t.
     //INT64_MAX = 9,223,372,036,854,775,807
@@ -251,7 +251,7 @@ void Encoder::run() {
         IMPEncoderStream stream;
 
         if (IMP_Encoder_GetStream(0, &stream, true) != 0) {
-            LOG(MODULE, "IMP_Encoder_GetStream() failed");
+            LOG_ERROR("IMP_Encoder_GetStream() failed");
             break;
         }
 

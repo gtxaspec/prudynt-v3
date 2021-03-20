@@ -7,13 +7,13 @@
 #define MODULE "RTSP"
 
 void RTSP::run() {
-    LOG(MODULE, "RUN");
+    LOG_INFO("RUN");
     TaskScheduler *scheduler = BasicTaskScheduler::createNew();
     UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
 
     RTSPServer *rtspServer = RTSPServer::createNew(*env, 8554, NULL);
     if (rtspServer == NULL) {
-        LOG(MODULE, "Failed to create RTSP server: " << env->getResultMsg() << "\n");
+        LOG_ERROR("Failed to create RTSP server: " << env->getResultMsg() << "\n");
         return;
     }
     OutPacketBuffer::maxSize = 500000;
@@ -45,7 +45,7 @@ void RTSP::run() {
     rtspServer->addServerMediaSession(sms);
 
     char* url = rtspServer->rtspURL(sms);
-    LOG(MODULE, "Play this stream from: " << url);
+    LOG_INFO("Play this stream from: " << url);
 
     env->taskScheduler().doEventLoop();
 }

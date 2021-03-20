@@ -1,7 +1,10 @@
 #ifndef Logger_hpp
 #define Logger_hpp
 
-#define LOG(mod, str) logger->write(LogMsg(mod) << str)
+#define LOG_ERROR(str) Logger::log(Logger::ERROR, __FILE__, LogMsg() << str)
+#define LOG_WARN(str) Logger::log(Logger::WARN, __FILE__, LogMsg() << str)
+#define LOG_INFO(str) Logger::log(Logger::INFO, __FILE__, LogMsg() << str)
+#define LOG_DEBUG(str) Logger::log(Logger::DEBUG, __FILE__, LogMsg() << str)
 
 #include <memory>
 #include <sstream>
@@ -31,15 +34,23 @@ public:
     Logger();
     void run();
 
+    enum Level {
+        ERROR,
+        WARN,
+        INFO,
+        DEBUG
+    };
+
+    static void log(Level level, std::string module, LogMsg msg);
+
     template <class T> void connect(T *c) {
         std::shared_ptr<MsgChannel<LogMsg>> chn = std::make_shared<MsgChannel<LogMsg>>(20);
         log_senders.push_back(chn);
         c->set_logger(chn);
     }
-
 private:
-    void log(LogMsg l);
-
+    static std::mutex log_mtx;
+    static Level level;
     std::vector<std::shared_ptr<MsgChannel<LogMsg>>> log_senders;
 };
 

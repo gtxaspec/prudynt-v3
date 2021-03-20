@@ -5,21 +5,30 @@
 
 #include "Logger.hpp"
 
+const char* text_levels[] = {
+    "ERROR",
+    "WARN",
+    "INFO",
+    "DEBUG"
+};
+
+Logger::Level Logger::level = DEBUG;
+std::mutex Logger::log_mtx;
+
 Logger::Logger() {
-    log(LogMsg(MODULE) << "Logger Init.");
+    LOG_INFO("Logger Init.");
+}
+
+void Logger::log(Level lvl, std::string module, LogMsg msg) {
+    if (Logger::level < lvl) {
+        return;
+    }
+    std::unique_lock<std::mutex> lck(log_mtx);
+    std::cout << "[" << text_levels[lvl] << ":" << module << "]: " << msg.log_str << std::endl;
 }
 
 void Logger::run() {
     while (true) {
-        for (unsigned int i = 0; i < log_senders.size(); ++i) {
-            LogMsg j;
-            if (log_senders[i]->read(&j))
-                log(j);
-            usleep(5000);
-        }
+        usleep(5000);
     }
-}
-
-void Logger::log(LogMsg l) {
-    std::cout << "[" << l.module << "]: " << l.log_str << std::endl;
 }
