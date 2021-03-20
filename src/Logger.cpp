@@ -26,9 +26,3 @@ void Logger::log(Level lvl, std::string module, LogMsg msg) {
     std::unique_lock<std::mutex> lck(log_mtx);
     std::cout << "[" << text_levels[lvl] << ":" << module << "]: " << msg.log_str << std::endl;
 }
-
-void Logger::run() {
-    while (true) {
-        usleep(5000);
-    }
-}

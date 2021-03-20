@@ -34,10 +34,6 @@ public:
         IMP_Encoder_FlushStream(0);
     }
 
-    void set_logger(std::shared_ptr<MsgChannel<LogMsg>> chn) {
-        logger = chn;
-    }
-
     template <class T> static uint32_t connect_sink(T *c) {
         std::shared_ptr<MsgChannel<H264NALUnit>> chn = std::make_shared<MsgChannel<H264NALUnit>>(10);
         std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
@@ -65,7 +61,6 @@ private:
     int framesource_init();
     int encoder_init();
     void set_day_mode(DayMode mode);
-    std::shared_ptr<MsgChannel<LogMsg>> logger;
     static std::mutex sinks_lock;
     static uint32_t sink_id;
     static std::map<uint32_t, EncoderSink> sinks;

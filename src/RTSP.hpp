@@ -15,12 +15,7 @@ public:
     void set_framesource(std::shared_ptr<MsgChannel<H264NALUnit>> chn) {
         encoder = chn;
     }
-
-    void set_logger(std::shared_ptr<MsgChannel<LogMsg>> chn) {
-        logger = chn;
-    }
 private:
-    std::shared_ptr<MsgChannel<LogMsg>> logger;
     std::shared_ptr<MsgChannel<H264NALUnit>> encoder;
 };
 
