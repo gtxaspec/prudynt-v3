@@ -113,14 +113,14 @@ int Encoder::encoder_init() {
     channel_attr.encAttr.picWidth = 1920;
     channel_attr.encAttr.picHeight = 1080;
 
-    channel_attr.rcAttr.outFrmRate.frmRateNum = FRAME_RATE;
+    channel_attr.rcAttr.outFrmRate.frmRateNum = IMP::FRAME_RATE;
     channel_attr.rcAttr.outFrmRate.frmRateDen = 1;
 
     //Setting maxGop to a low value causes the encoder to emit frames at a much
     //slower rate. A sufficiently low value can cause the frame emission rate to
     //drop below the frame rate.
     //I find that 2x the frame rate is a good setting.
-    rc_attr->maxGop = FRAME_RATE * 2;
+    rc_attr->maxGop = IMP::FRAME_RATE * 2;
     {
         rc_attr->attrRcMode.rcMode = ENC_RC_MODE_SMART;
         rc_attr->attrRcMode.attrH264Smart.maxQp = 40;
