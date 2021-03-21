@@ -7,6 +7,9 @@ set(WYZEDOM_SOURCE
   IMPServerMediaSubsession.cpp
   IMPDeviceSource.cpp
   OSD.cpp
+  GPIO.cpp
+  Motion.cpp
+  MotionClip.cpp
 )
 
 add_executable(${PROJECT_NAME} ${WYZEDOM_SOURCE})
