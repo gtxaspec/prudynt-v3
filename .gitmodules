@@ -1,3 +1,0 @@
-[submodule "toolchain"]
-	path = toolchain
-	url = https://github.com/Dafang-Hacks/mips-gcc472-glibc216-64bit.git
