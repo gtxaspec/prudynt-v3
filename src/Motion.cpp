@@ -140,35 +140,34 @@ void Motion::run() {
     H264NALUnit nal;
     while (true) {
         nal = encoder->wait_read();
-        if (!Motion::moving) {
-            prebuffer(nal);
-            if (clip != nullptr) {
-                //End of motion clip
-                clip->close();
-                clip = nullptr;
-            }
-        }
-        else {
-            if (clip == nullptr) {
-                //Start recording
-                clip = MotionClip::begin();
-                //Flush the prebuffer into the clip
-                auto last_idr = nalus.begin();
-                for (auto it = nalus.begin(); it != nalus.end(); ++it) {
-                    clip->write(*it);
-                    if (((*it).data[0] & 0x1F) == 7) {
-                        last_idr = it;
-                    }
-                }
-                //Clear all but the last IDR
-                if (sps.size() > 1) {
-                    nalus.erase(nalus.begin(), last_idr);
-                    H264NALUnit* last_sps = sps.back();
-                    sps.clear();
-                    sps.push_back(last_sps);
-                }
-            }
+        prebuffer(nal);
+
+        if (clip != nullptr) {
             clip->write(nal);
+        }
+        if (!Motion::moving && clip != nullptr) {
+            //End of motion clip
+            clip->close();
+            clip = nullptr;
+        }
+        else if (Motion::moving && clip == nullptr) {
+            //Start recording
+            clip = MotionClip::begin();
+            //Flush the prebuffer into the clip
+            auto last_idr = nalus.begin();
+            for (auto it = nalus.begin(); it != nalus.end(); ++it) {
+                clip->write(*it);
+                if (((*it).data[0] & 0x1F) == 7) {
+                    last_idr = it;
+                }
+            }
+            //Clear all but the last IDR
+            if (sps.size() > 1) {
+                nalus.erase(nalus.begin(), last_idr);
+                H264NALUnit* last_sps = sps.back();
+                sps.clear();
+                sps.push_back(last_sps);
+            }
         }
 
 #if MOTION_STRICT_IDR
