@@ -35,6 +35,7 @@ public:
     }
 
     template <class T> static uint32_t connect_sink(T *c) {
+        LOG_DEBUG("Create Sink: " << Encoder::sink_id);
         std::shared_ptr<MsgChannel<H264NALUnit>> chn = std::make_shared<MsgChannel<H264NALUnit>>(10);
         std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
         Encoder::sinks.insert(std::pair<uint32_t,EncoderSink>(Encoder::sink_id, {chn,false}));
@@ -44,6 +45,7 @@ public:
     }
 
     static void remove_sink(uint32_t sinkid) {
+        LOG_DEBUG("Destroy Sink: " << sinkid);
         std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
         Encoder::sinks.erase(sinkid);
     }
