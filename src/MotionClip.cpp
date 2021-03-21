@@ -15,6 +15,7 @@ MotionClip::MotionClip() {
     clip_path += std::string(formatted);
     clip_path += ".h264";
 
+    LOG_DEBUG("Writing to " << clip_path);
     clip.open(clip_path, std::ofstream::out);
 }
 
