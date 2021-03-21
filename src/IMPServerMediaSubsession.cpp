@@ -31,7 +31,7 @@ FramedSource* IMPServerMediaSubsession::createNewStreamSource(
     unsigned clientSessionId,
     unsigned& estBitrate
 ) {
-    std::cout << "Create Stream Source." << std::endl;
+    LOG_DEBUG("Create Stream Source.");
     estBitrate = 5000;
 
     IMPDeviceSource *imp = IMPDeviceSource::createNew(envir());

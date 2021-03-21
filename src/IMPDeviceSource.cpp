@@ -9,12 +9,12 @@ IMPDeviceSource* IMPDeviceSource::createNew(UsageEnvironment& env) {
 IMPDeviceSource::IMPDeviceSource(UsageEnvironment& env)
     : FramedSource(env)
 {
-    std::cout << "device source construct" << std::endl;
+    LOG_DEBUG("Device source construct");
     sink_id = Encoder::connect_sink(this);
 }
 
 IMPDeviceSource::~IMPDeviceSource() {
-    std::cout << "device source destruct" << std::endl;
+    LOG_DEBUG("Device source destruct");
     Encoder::remove_sink(sink_id);
 }
 
