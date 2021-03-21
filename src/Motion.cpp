@@ -22,16 +22,18 @@ void Motion::detect() {
             continue;
         }
 
-        time_t now = time(NULL);
+        struct timeval now, diff;
+        gettimeofday(&now, NULL);
         if (result->retRoi[0]) {
             if (!Motion::moving) {
                 LOG_INFO("Motion Start");
                 Motion::moving = true;
             }
-            move_time = time(NULL);
+            gettimeofday(&move_time, NULL);
         }
         else {
-            if (Motion::moving && (now - move_time) >= MOTION_POST_TIME) {
+            timersub(&now, &move_time, &diff);
+            if (Motion::moving && diff.tv_sec >= MOTION_POST_TIME) {
                 LOG_INFO("End of Motion");
                 Motion::moving = false;
             }

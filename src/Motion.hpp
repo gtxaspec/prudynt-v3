@@ -42,7 +42,7 @@ private:
     IMP_IVS_MoveParam move_param;
     IMPIVSInterface *move_intf;
     static std::thread detect_thread;
-    time_t move_time;
+    struct timeval move_time;
 
     //Motion clip recording
     std::shared_ptr<MotionClip> clip = nullptr;
