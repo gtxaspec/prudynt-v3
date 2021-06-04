@@ -2,6 +2,7 @@
 #include "Motion.hpp"
 
 std::atomic<bool> Motion::moving;
+std::atomic<bool> Motion::indicator;
 std::thread Motion::detect_thread;
 void Motion::detect_start(Motion *m) { m->detect(); }
 
@@ -30,6 +31,7 @@ void Motion::detect() {
                 Motion::moving = true;
             }
             gettimeofday(&move_time, NULL);
+            Motion::indicator = true;
         }
         else {
             timersub(&now, &move_time, &diff);
@@ -37,6 +39,7 @@ void Motion::detect() {
                 LOG_INFO("End of Motion");
                 Motion::moving = false;
             }
+            Motion::indicator = false;
         }
 
         ret = IMP_IVS_ReleaseResult(0, (void**)&result);

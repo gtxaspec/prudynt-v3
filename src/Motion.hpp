@@ -34,6 +34,7 @@ public:
     }
 public:
     static std::atomic<bool> moving;
+    static std::atomic<bool> indicator;
 private:
     static void detect_start(Motion *m);
     void detect();
