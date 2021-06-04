@@ -36,7 +36,7 @@ void RTSP::run() {
     Encoder::remove_sink(sink_id);
 
     ServerMediaSession *sms = ServerMediaSession::createNew(
-        *env, "Main", "Main", "Wyzecam"
+        *env, "unicast", "Main", "Wyzecam"
     );
     IMPServerMediaSubsession *sub = IMPServerMediaSubsession::createNew(
         *env, sps, pps
