@@ -34,4 +34,11 @@ target_link_libraries(${PROJECT_NAME}
   BasicUsageEnvironment
   UsageEnvironment
   freetype.a
+  avdevice
+  avformat
+  avfilter
+  avcodec
+  swresample
+  swscale
+  avutil
 )
