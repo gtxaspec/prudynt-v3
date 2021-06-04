@@ -1,10 +1,13 @@
 #ifndef Logger_hpp
 #define Logger_hpp
 
-#define LOG_ERROR(str) Logger::log(Logger::ERROR, __FILE__, LogMsg() << str)
-#define LOG_WARN(str) Logger::log(Logger::WARN, __FILE__, LogMsg() << str)
-#define LOG_INFO(str) Logger::log(Logger::INFO, __FILE__, LogMsg() << str)
-#define LOG_DEBUG(str) Logger::log(Logger::DEBUG, __FILE__, LogMsg() << str)
+#include <cstring>
+
+#define __FILENAME__ (strrchr("/" __FILE__, '/') + 1)
+#define LOG_ERROR(str) Logger::log(Logger::ERROR, __FILENAME__, LogMsg() << str)
+#define LOG_WARN(str) Logger::log(Logger::WARN, __FILENAME__, LogMsg() << str)
+#define LOG_INFO(str) Logger::log(Logger::INFO, __FILENAME__, LogMsg() << str)
+#define LOG_DEBUG(str) Logger::log(Logger::DEBUG, __FILENAME__, LogMsg() << str)
 
 #include <memory>
 #include <sstream>
