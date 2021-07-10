@@ -29,6 +29,20 @@ make -j$(nproc)
 make install
 cd ../../
 
+echo "Build ffmpeg"
+cd 3rdparty
+rm -rf ffmpeg
+if [[ ! -f ffmpeg-4.3.2.tar.xz ]]; then
+    wget 'https://ffmpeg.org/releases/ffmpeg-4.3.2.tar.xz'
+fi
+tar xvf ffmpeg-4.3.2.tar.xz
+mv ffmpeg-4.3.2 ffmpeg
+cd ffmpeg
+./configure --disable-zlib --target-os=linux --cpu=24kf --arch=mipsel --cc="${PRUDYNT_CROSS}gcc" --cxx="${PRUDYNT_CROSS}g++" --strip="${PRUDYNT_CROSS}strip" --prefix="$TOP/3rdparty/install" --enable-gpl --enable-cross-compile
+make -j$(nproc)
+make install
+cd ../../
+
 echo "Build live555"
 cd 3rdparty/live
 if [[ -f Makefile ]]; then
