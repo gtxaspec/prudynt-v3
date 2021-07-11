@@ -9,6 +9,8 @@
 
 #define MODULE "ENCODER"
 
+#include "IMP.hpp"
+#include "GPIO.hpp"
 #include "Encoder.hpp"
 
 std::mutex Encoder::sinks_lock;
