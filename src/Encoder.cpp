@@ -296,6 +296,7 @@ void Encoder::run() {
 #endif
 
             H264NALUnit nalu;
+            nalu.imp_ts = stream.pack[i].timestamp;
             timeradd(&imp_time_base, &encode_time, &nalu.time);
             //We use start+4 because the encoder inserts 4-byte MPEG
             //'startcodes' at the beginning of each NAL. Live555 complains
