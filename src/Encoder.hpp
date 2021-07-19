@@ -22,6 +22,7 @@ struct H264NALUnit {
 struct EncoderSink {
     std::shared_ptr<MsgChannel<H264NALUnit>> chn;
     bool IDR;
+    std::string name;
 };
 
 class Encoder {
@@ -35,11 +36,11 @@ public:
         IMP_Encoder_FlushStream(0);
     }
 
-    template <class T> static uint32_t connect_sink(T *c) {
+    template <class T> static uint32_t connect_sink(T *c, std::string name = "Unnamed") {
         LOG_DEBUG("Create Sink: " << Encoder::sink_id);
         std::shared_ptr<MsgChannel<H264NALUnit>> chn = std::make_shared<MsgChannel<H264NALUnit>>(10);
         std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
-        Encoder::sinks.insert(std::pair<uint32_t,EncoderSink>(Encoder::sink_id, {chn,false}));
+        Encoder::sinks.insert(std::pair<uint32_t,EncoderSink>(Encoder::sink_id, {chn, false, name}));
         c->set_framesource(chn);
         Encoder::flush();
         return Encoder::sink_id++;

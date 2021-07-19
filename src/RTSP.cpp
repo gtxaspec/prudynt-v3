@@ -18,7 +18,7 @@ void RTSP::run() {
     }
     OutPacketBuffer::maxSize = 500000;
 
-    int sink_id = Encoder::connect_sink(this);
+    int sink_id = Encoder::connect_sink(this, "SPSPPS");
     H264NALUnit sps, pps;
     bool have_pps = false, have_sps = false;
     //Read from the stream until we capture the SPS and PPS.
