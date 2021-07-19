@@ -45,6 +45,8 @@ public:
 private:
     static std::mutex log_mtx;
     static Level level;
+    static std::fstream log_file;
+    static bool have_file;
 };
 
 #endif
