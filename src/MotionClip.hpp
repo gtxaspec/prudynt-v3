@@ -12,8 +12,8 @@ extern "C" {
 class MotionClip {
 public:
     static std::shared_ptr<MotionClip> begin();
-    void write(H264NALUnit nal);
-    void close();
+    void add_nal(H264NALUnit nal);
+    void write();
 private:
     MotionClip();
 private:

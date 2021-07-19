@@ -37,6 +37,7 @@ public:
     static std::atomic<bool> indicator;
 private:
     static void detect_start(Motion *m);
+    static void write_clip(std::shared_ptr<MotionClip> mc);
     void detect();
     void prebuffer(H264NALUnit &nal);
 private:

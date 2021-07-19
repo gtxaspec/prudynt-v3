@@ -5,6 +5,7 @@ std::atomic<bool> Motion::moving;
 std::atomic<bool> Motion::indicator;
 std::thread Motion::detect_thread;
 void Motion::detect_start(Motion *m) { m->detect(); }
+void Motion::write_clip(std::shared_ptr<MotionClip> mc) { mc->write(); }
 
 void Motion::detect() {
     LOG_INFO("Detection thread started");
@@ -146,11 +147,11 @@ void Motion::run() {
         prebuffer(nal);
 
         if (clip != nullptr) {
-            clip->write(nal);
+            clip->add_nal(nal);
         }
         if (!Motion::moving && clip != nullptr) {
             //End of motion clip
-            clip->close();
+            std::thread(Motion::write_clip, std::move(clip)).detach();
             clip = nullptr;
         }
         else if (Motion::moving && clip == nullptr) {
@@ -159,7 +160,7 @@ void Motion::run() {
             //Flush the prebuffer into the clip
             auto last_idr = nalus.begin();
             for (auto it = nalus.begin(); it != nalus.end(); ++it) {
-                clip->write(*it);
+                clip->add_nal(*it);
                 if (((*it).data[0] & 0x1F) == 7) {
                     last_idr = it;
                 }

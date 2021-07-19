@@ -70,51 +70,69 @@ MotionClip::MotionClip() {
     av_dump_format(oc, 0, clip_path.c_str(), 1);
 }
 
-void MotionClip::write(H264NALUnit nal) {
-    int res;
-
+void MotionClip::add_nal(H264NALUnit nal) {
     if (!init_pts_set) {
         initial_pts = nal.imp_ts;
         init_pts_set = true;
     }
 
     nal_buffer.push_back(nal);
-    if ((nal.data[0] & 0x1F) == 5 || (nal.data[0] & 0x1F) == 1) {
-        uint8_t startcode[4] = { 0, 0, 0, 1 };
-        std::vector<uint8_t> naldata;
-        int64_t nal_ts = 0;
-        for (unsigned int i = 0; i < nal_buffer.size(); ++i) {
-            naldata.insert(naldata.end(), startcode, startcode + 4);
-            naldata.insert(
-                naldata.end(),
-                nal_buffer[i].data.begin(),
-                nal_buffer[i].data.end()
-            );
-            nal_ts = nal_buffer[i].imp_ts;
-        }
-        nal_buffer.clear();
-
-        AVPacket pkt;
-        av_init_packet(&pkt);
-        if ((nal.data[0] & 0x1F) == 5)
-            pkt.flags |= AV_PKT_FLAG_KEY;
-        pkt.stream_index = vs->index;
-        pkt.data = &naldata[0];
-        pkt.size = naldata.size();
-        pkt.pts = nal_ts - initial_pts;
-        pkt.dts = nal_ts - initial_pts;
-        pkt.pos = -1;
-        pkt.duration = 1000000 / IMP::FRAME_RATE;
-        ++pts;
-        av_packet_rescale_ts(&pkt, { 1, 1000000 }, vs->time_base);
-        res = av_write_frame(oc, &pkt);
-        if (res < 0) {
-            LOG_ERROR("Error muxing packet: " << res);
-        }
-    }
 }
 
-void MotionClip::close() {
+void MotionClip::write() {
+    uint8_t startcode[4] = { 0, 0, 0, 1 };
+    std::vector<uint8_t> naldata;
+    int64_t nal_ts = 0;
+    int res;
+
+    auto it = nal_buffer.begin();
+    //Find first iframe
+    while (it != nal_buffer.end()) {
+        if ((it->data[0] & 0x1F) == 5 || (it->data[0] & 0x1F) == 1) {
+            naldata.insert(naldata.end(), startcode, startcode + 4);
+            naldata.insert(naldata.end(), it->data.begin(), it->data.end());
+            nal_ts = it->imp_ts;
+            ++it;
+            break;
+        }
+        ++it;
+    }
+    while (true) {
+        if (it == nal_buffer.end())
+            break;
+
+        naldata.insert(naldata.end(), startcode, startcode + 4);
+        naldata.insert(naldata.end(), it->data.begin(), it->data.end());
+        nal_ts = it->imp_ts;
+
+        if ((it->data[0] & 0x1F) == 5 || (it->data[0] & 0x1F) == 1) {
+            AVPacket pkt;
+            av_init_packet(&pkt);
+            if ((it->data[0] & 0x1F) == 5)
+                pkt.flags |= AV_PKT_FLAG_KEY;
+            pkt.stream_index = vs->index;
+            pkt.data = &naldata[0];
+            pkt.size = naldata.size();
+            pkt.pts = nal_ts - initial_pts;
+            pkt.dts = nal_ts - initial_pts;
+            pkt.pos = -1;
+            pkt.duration = 1000000 / IMP::FRAME_RATE;
+            ++pts;
+            av_packet_rescale_ts(&pkt, {1, 1000000 }, vs->time_base);
+            res = av_write_frame(oc, &pkt);
+            if (res < 0) {
+                LOG_ERROR("Error muxing packet: " << res);
+            }
+
+            if (it == nal_buffer.end())
+                break;
+            //Reset naldata
+            naldata.clear();
+        }
+        ++it;
+    }
+    nal_buffer.clear();
+
     av_write_trailer(oc);
     avio_closep(&oc->pb);
     avformat_free_context(oc);
