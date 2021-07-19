@@ -137,7 +137,7 @@ void Motion::prebuffer(H264NALUnit &nal) {
 void Motion::run() {
     LOG_INFO("Starting Motion Detector");
 
-    sink_id = Encoder::connect_sink(this);
+    sink_id = Encoder::connect_sink(this, "Motion");
     Motion::moving = false;
     detect_thread = std::thread(Motion::detect_start, this);
 
