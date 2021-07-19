@@ -17,6 +17,10 @@ RTSP rtsp;
 Motion motion;
 
 int main(int argc, const char *argv[]) {
+    if (Logger::init()) {
+        std::cout << "Logger initialization failed." << std::endl;
+        return 1;
+    }
     if (IMP::init()) {
         std::cout << "IMP initialization failed." << std::endl;
         return 1;

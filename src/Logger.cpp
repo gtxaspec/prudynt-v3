@@ -15,7 +15,7 @@ const char* text_levels[] = {
 Logger::Level Logger::level = DEBUG;
 std::mutex Logger::log_mtx;
 
-Logger::Logger() {
+bool Logger::init() {
     LOG_INFO("Logger Init.");
 }
 

@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <sstream>
+#include <fstream>
 
 #include "MsgChannel.hpp"
 
@@ -32,8 +33,6 @@ struct LogMsg {
 
 class Logger {
 public:
-    Logger();
-
     enum Level {
         ERROR,
         WARN,
@@ -41,6 +40,7 @@ public:
         DEBUG
     };
 
+    static bool init();
     static void log(Level level, std::string module, LogMsg msg);
 private:
     static std::mutex log_mtx;
