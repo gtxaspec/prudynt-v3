@@ -240,6 +240,8 @@ void Encoder::set_day_mode(DayMode mode) {
 void Encoder::run() {
     LOG_INFO("Encoder Start.");
 
+    int64_t last_nal_ts = 0;
+
     //The encoder tracks NAL timestamps with an int64_t.
     //INT64_MAX = 9,223,372,036,854,775,807
     //That means the encoder won't overflow its timestamp unless
@@ -261,6 +263,10 @@ void Encoder::run() {
         //really matter which NAL we select here as they
         //all have identical timestamps.
         int64_t nal_ts = stream.pack[stream.packCount - 1].timestamp;
+        if (nal_ts - last_nal_ts > 1.5*(1000000/IMP::FRAME_RATE)) {
+            LOG_WARN("The encoder dropped a frame.");
+        }
+        last_nal_ts = nal_ts;
         struct timeval encode_time;
         encode_time.tv_sec  = nal_ts / 1000000;
         encode_time.tv_usec = nal_ts % 1000000;
