@@ -298,7 +298,7 @@ RTSPServer::RTSPClientConnection
   : GenericMediaServer::ClientConnection(ourServer, clientSocket, clientAddr),
     fOurRTSPServer(ourServer), fClientInputSocket(fOurSocket), fClientOutputSocket(fOurSocket),
     fAddressFamily(clientAddr.ss_family),
-    fIsActive(True), fRecursionCount(0), fOurSessionCookie(NULL) {
+    fIsActive(True), fRecursionCount(0), fOurSessionCookie(NULL), fScheduledDelayedTask(0) {
   resetRequestBuffer();
 }
 
@@ -938,7 +938,8 @@ void RTSPServer::RTSPClientConnection::handleRequestBytes(int newBytesRead) {
   } while (numBytesRemaining > 0);
   
   --fRecursionCount;
-  if (!fIsActive) {
+  // If it has a scheduledDelayedTask, don't delete the instance or close the sockets. The sockets can be reused in the task.
+  if (!fIsActive && fScheduledDelayedTask <= 0) {
     if (fRecursionCount > 0) closeSockets(); else delete this;
     // Note: The "fRecursionCount" test is for a pathological situation where we reenter the event loop and get called recursively
     // while handling a command (e.g., while handling a "DESCRIBE", to get a SDP description).

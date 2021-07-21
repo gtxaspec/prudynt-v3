@@ -639,7 +639,7 @@ FramedSource* ProxyServerMediaSubsession::createNewStreamSource(unsigned clientS
   return fClientMediaSubsession.readSource();
 }
 
-void ProxyServerMediaSubsession::closeStreamSource(FramedSource* inputSource) {
+void ProxyServerMediaSubsession::closeStreamSource(FramedSource* /*inputSource*/) {
   if (verbosityLevel() > 0) {
     envir() << *this << "::closeStreamSource()\n";
   }
@@ -653,10 +653,13 @@ void ProxyServerMediaSubsession::closeStreamSource(FramedSource* inputSource) {
     if (proxyRTSPClient->fLastCommandWasPLAY) { // so that we send only one "PAUSE"; not one for each subsession
       if (fParentSession->referenceCount() > 1) {
 	// There are other client(s) still streaming other subsessions of this stream.
-	// Therefore, we don't send a "PAUSE" for the whole stream, but only for the sub-stream:
-	proxyRTSPClient->sendPauseCommand(fClientMediaSubsession, NULL, proxyRTSPClient->auth());
+	// Therefore, we don't send a "PAUSE" for the whole stream.
+	// In principle, we would send a "PAUSE" only for the sub-stream here, but some
+	// back-end servers might mis-handle that by pausing the entire stream.
+	// So instead, we do nothing here.
+	//proxyRTSPClient->sendPauseCommand(fClientMediaSubsession, NULL, proxyRTSPClient->auth());
       } else {
-	// Normal case: There are no other client still streaming (parts of) this stream.
+	// Normal case: There are no other clients still streaming (parts of) this stream.
 	// Send a "PAUSE" for the whole stream.
 	proxyRTSPClient->sendPauseCommand(fClientMediaSubsession.parentSession(), NULL, proxyRTSPClient->auth());
 	proxyRTSPClient->fLastCommandWasPLAY = False;

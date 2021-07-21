@@ -30,6 +30,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // To receive a "source-specific multicast" (SSM) stream, uncomment this:
 //#define USE_SSM 1
 
+// To stream using IPv6 multicast, rather than IPv4 multicast, uncomment the following:
+//#define USE_IPV6_MULTICAST 1
+
 void afterPlaying(void* clientData); // forward
 
 // A structure to hold the state of the current session.
@@ -54,13 +57,21 @@ int main(int argc, char** argv) {
 
   // Create 'groupsocks' for RTP and RTCP:
   char const* sessionAddressStr
+#ifdef USE_IPV6_MULTICAST
+#ifdef USE_SSM
+    = "FF3E::FFFF:2A2A";
+#else
+    = "FF1E::FFFF:2A2A";
+#endif
+#else
 #ifdef USE_SSM
     = "232.255.42.42";
 #else
     = "239.255.42.42";
+#endif
+#endif
   // Note: If the session is unicast rather than multicast,
   // then replace this string with "0.0.0.0"
-#endif
   const unsigned short rtpPortNum = 6666;
   const unsigned short rtcpPortNum = rtpPortNum+1;
 #ifndef USE_SSM

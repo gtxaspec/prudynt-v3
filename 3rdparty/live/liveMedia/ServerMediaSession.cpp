@@ -260,7 +260,7 @@ char* ServerMediaSession::generateSDPDescription(int addressFamily) {
     // Unless subsessions have differing durations, we also have a "a=range:" line:
     float dur = duration();
     if (dur == 0.0) {
-      rangeLine = strDup("a=range:npt=0-\r\n");
+      rangeLine = strDup("a=range:npt=now-\r\n");
     } else if (dur > 0.0) {
       char buf[100];
       sprintf(buf, "a=range:npt=0-%.3f\r\n", dur);
@@ -455,7 +455,7 @@ ServerMediaSubsession::rangeSDPLine() const {
   // Use our own duration for a "a=range:" line:
   float ourDuration = duration();
   if (ourDuration == 0.0) {
-    return strDup("a=range:npt=0-\r\n");
+    return strDup("a=range:npt=now-\r\n");
   } else {
     char buf[100];
     sprintf(buf, "a=range:npt=0-%.3f\r\n", ourDuration);

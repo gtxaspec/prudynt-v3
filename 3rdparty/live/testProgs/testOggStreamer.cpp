@@ -19,7 +19,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // main program
 
 #include <liveMedia.hh>
+
 #include <BasicUsageEnvironment.hh>
+#include "announceURL.hh"
 #include <GroupsockHelper.hh>
 
 UsageEnvironment* env;
@@ -133,10 +135,7 @@ void onOggFileCreation(OggFile* newFile, void* clientData) {
   }
 
   rtspServer->addServerMediaSession(sms);
-
-  char* url = rtspServer->rtspURL(sms);
-  *env << "Play this stream using the URL \"" << url << "\"\n";
-  delete[] url;
+  announceURL(rtspServer, sms);
 
   // Start the streaming:
   play();

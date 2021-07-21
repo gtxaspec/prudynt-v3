@@ -20,7 +20,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // C++ header
 
 #ifndef _MPEG2_TRANSPORT_STREAM_ACCUMULATOR_HH
-#define _MPEG_TRANSPORT_STREAM_ACCUMULATOR_HH
+#define _MPEG2_TRANSPORT_STREAM_ACCUMULATOR_HH
 
 #ifndef _FRAMED_FILTER_HH
 #include "FramedFilter.hh"
@@ -55,31 +55,6 @@ private:
 private:
   unsigned const fDesiredPacketSize;
   unsigned fNumBytesGathered;
-};
-
-#endif
-
-#ifndef _MP3_TRANSCODER_HH
-#define _MP3_TRANSCODER_HH
-
-#ifndef _MP3_ADU_HH
-#include "MP3ADU.hh"
-#endif
-#ifndef _MP3_ADU_TRANSCODER_HH
-#include "MP3ADUTranscoder.hh"
-#endif
-
-class MP3Transcoder: public MP3FromADUSource {
-public:
-  static MP3Transcoder* createNew(UsageEnvironment& env,
-				  unsigned outBitrate /* in kbps */,
-				  FramedSource* inputSource);
-
-protected:
-  MP3Transcoder(UsageEnvironment& env,
-		MP3ADUTranscoder* aduTranscoder);
-      // called only by createNew()
-  virtual ~MP3Transcoder();
 };
 
 #endif

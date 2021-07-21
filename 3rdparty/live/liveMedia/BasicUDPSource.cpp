@@ -42,6 +42,10 @@ BasicUDPSource::~BasicUDPSource(){
   envir().taskScheduler().turnOffBackgroundReadHandling(fInputGS->socketNum());
 }
 
+unsigned BasicUDPSource::maxFrameSize() const {
+  return 0xFFFF; // maximum size of a UDP payload
+}
+
 void BasicUDPSource::doGetNextFrame() {
   if (!fHaveStartedReading) {
     // Await incoming packets:

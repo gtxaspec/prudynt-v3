@@ -20,7 +20,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // main program
 
 #include "liveMedia.hh"
+
 #include "BasicUsageEnvironment.hh"
+#include "announceURL.hh"
 #include "GroupsockHelper.hh"
 
 UsageEnvironment* env;
@@ -35,11 +37,9 @@ void play(); // forward
 
 // To stream using "source-specific multicast" (SSM), uncomment the following:
 //#define USE_SSM 1
-#ifdef USE_SSM
-Boolean const isSSM = True;
-#else
-Boolean const isSSM = False;
-#endif
+
+// To stream using IPv6 multicast, rather than IPv4 multicast, uncomment the following:
+//#define USE_IPV6_MULTICAST 1
 
 // To set up an internal RTSP server, uncomment the following:
 //#define IMPLEMENT_RTSP_SERVER 1
@@ -49,6 +49,12 @@ Boolean const isSSM = False;
 // change the following "False" to "True":
 Boolean iFramesOnly = False;
 
+#ifdef USE_SSM
+Boolean const isSSM = True;
+#else
+Boolean const isSSM = False;
+#endif
+
 int main(int argc, char** argv) {
   // Begin by setting up our usage environment:
   TaskScheduler* scheduler = BasicTaskScheduler::createNew();
@@ -56,15 +62,24 @@ int main(int argc, char** argv) {
 
   // Create 'groupsocks' for RTP and RTCP:
   char const* destinationAddressStr
+#ifdef USE_IPV6_MULTICAST
+#ifdef USE_SSM
+    = "FF3E::FFFF:2A2A";
+#else
+    = "FF1E::FFFF:2A2A";
+#endif
+#else
 #ifdef USE_SSM
     = "232.255.42.42";
 #else
     = "239.255.42.42";
+#endif
+#endif
   // Note: This is a multicast address.  If you wish to stream using
   // unicast instead, then replace this string with the unicast address
   // of the (single) destination.  (You may also need to make a similar
   // change to the receiver program.)
-#endif
+
   const unsigned short rtpPortNumAudio = 6666;
   const unsigned short rtcpPortNumAudio = rtpPortNumAudio+1;
   const unsigned short rtpPortNumVideo = 8888;
@@ -122,10 +137,7 @@ int main(int argc, char** argv) {
   // Note: This starts RTCP running automatically
 
 #ifdef IMPLEMENT_RTSP_SERVER
-  RTSPServer* rtspServer = RTSPServer::createNew(*env);
-  // Note that this (attempts to) start a server on the default RTSP server
-  // port: 554.  To use a different port number, add it as an extra
-  // (optional) parameter to the "RTSPServer::createNew()" call above.
+  RTSPServer* rtspServer = RTSPServer::createNew(*env, 8554);
   if (rtspServer == NULL) {
     *env << "Failed to create RTSP server: " << env->getResultMsg() << "\n";
     exit(1);
@@ -137,10 +149,7 @@ int main(int argc, char** argv) {
   sms->addSubsession(PassiveServerMediaSubsession::createNew(*audioSink, audioRTCP));
   sms->addSubsession(PassiveServerMediaSubsession::createNew(*videoSink, videoRTCP));
   rtspServer->addServerMediaSession(sms);
-
-  char* url = rtspServer->rtspURL(sms);
-  *env << "Play this stream using the URL \"" << url << "\"\n";
-  delete[] url;
+  announceURL(rtspServer, sms);
 #endif
 
   // Finally, start the streaming:

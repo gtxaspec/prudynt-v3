@@ -229,6 +229,7 @@ public: // should be protected, but some old compilers complain otherwise
     Authenticator fCurrentAuthenticator; // used if access control is needed
     char* fOurSessionCookie; // used for optional RTSP-over-HTTP tunneling
     unsigned fBase64RemainderCount; // used for optional RTSP-over-HTTP tunneling (possible values: 0,1,2,3)
+    unsigned fScheduledDelayedTask;
   };
 
   // The state of an individual client session (using one or more sequential TCP connections) handled by a RTSP server:

@@ -44,6 +44,7 @@ private:
   void incomingPacketHandler1();
 
 private: // redefined virtual functions:
+  virtual unsigned maxFrameSize() const;
   virtual void doGetNextFrame();
   virtual void doStopGettingFrames();
 

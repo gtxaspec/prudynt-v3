@@ -14,12 +14,29 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // Copyright (c) 1996-2021, Live Networks, Inc.  All rights reserved
-// Version information for the LIVE555 Media Server application
-// Header file
+// A common function that outputs the URL(s) that can be used to access a stream
+// served by a RTSP server.
+// Implementation
 
-#ifndef _MEDIA_SERVER_VERSION_HH
-#define _MEDIA_SERVER_VERSION_HH
+#include "announceURL.hh"
+#include <GroupsockHelper.hh> // for "weHaveAnIPv*Address()"
 
-#define MEDIA_SERVER_VERSION_STRING "1.09"
+void announceURL(RTSPServer* rtspServer, ServerMediaSession* sms) {
+  if (rtspServer == NULL || sms == NULL) return; // sanuty check
 
-#endif
+  UsageEnvironment& env = rtspServer->envir();
+
+  env << "Play this stream using the URL ";
+  if (weHaveAnIPv4Address(env)) {
+    char* url = rtspServer->ipv4rtspURL(sms);
+    env << "\"" << url << "\"";
+    delete[] url;
+    if (weHaveAnIPv6Address(env)) env << " or ";
+  }
+  if (weHaveAnIPv6Address(env)) {
+    char* url = rtspServer->ipv6rtspURL(sms);
+    env << "\"" << url << "\"";
+    delete[] url;
+  }
+  env << "\n";
+}

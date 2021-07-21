@@ -19,8 +19,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // main program
 
 #include "liveMedia.hh"
+
 #include "BasicUsageEnvironment.hh"
-#include <GroupsockHelper.hh> // for "weHaveAnIPv*Address()"
+#include "announceURL.hh"
 
 UsageEnvironment* env;
 
@@ -36,7 +37,6 @@ Boolean iFramesOnly = False;
 
 static void announceStream(RTSPServer* rtspServer, ServerMediaSession* sms,
 			   char const* streamName, char const* inputFileName); // forward
-static void announceURL(RTSPServer* rtspServer, ServerMediaSession* sms); // forward
 
 static char newDemuxWatchVariable;
 
@@ -451,22 +451,4 @@ static void announceStream(RTSPServer* rtspServer, ServerMediaSession* sms,
   env << "\n\"" << streamName << "\" stream, from the file \""
       << inputFileName << "\"\n";
   announceURL(rtspServer, sms);
-}
-
-static void announceURL(RTSPServer* rtspServer, ServerMediaSession* sms) {
-  UsageEnvironment& env = rtspServer->envir();
-
-  env << "Play this stream using the URL ";
-  if (weHaveAnIPv4Address(env)) {
-    char* url = rtspServer->ipv4rtspURL(sms);
-    env << "\"" << url << "\"";
-    delete[] url;
-    if (weHaveAnIPv6Address(env)) env << " or ";
-  }
-  if (weHaveAnIPv6Address(env)) {
-    char* url = rtspServer->ipv6rtspURL(sms);
-    env << "\"" << url << "\"";
-    delete[] url;
-  }
-  env << "\n";
 }

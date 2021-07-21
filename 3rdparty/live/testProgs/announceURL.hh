@@ -14,12 +14,17 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // Copyright (c) 1996-2021, Live Networks, Inc.  All rights reserved
-// Version information for the LIVE555 Media Server application
-// Header file
+// A common function that outputs the URL(s) that can be used to access a stream
+// served by a RTSP server.
+// C++ header
 
-#ifndef _MEDIA_SERVER_VERSION_HH
-#define _MEDIA_SERVER_VERSION_HH
+#ifndef _ANNOUNCE_URL_HH
+#define _ANNOUNCE_URL_HH
 
-#define MEDIA_SERVER_VERSION_STRING "1.09"
+#ifndef _LIVEMEDIA_HH
+#include "liveMedia.hh"
+#endif
+
+void announceURL(RTSPServer* rtspServer, ServerMediaSession* sms);
 
 #endif

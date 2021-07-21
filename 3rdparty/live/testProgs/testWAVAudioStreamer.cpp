@@ -18,9 +18,10 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // main program
 
 #include "liveMedia.hh"
-#include "GroupsockHelper.hh"
 
 #include "BasicUsageEnvironment.hh"
+#include "announceURL.hh"
+#include "GroupsockHelper.hh"
 
 // To convert 16-bit samples to 8-bit u-law ("u" is the Greek letter "mu")
 // encoding, before streaming, uncomment the following line:
@@ -213,10 +214,7 @@ void play() {
 	   "Session streamed by \"testWAVAudiotreamer\"", True/*SSM*/);
   sms->addSubsession(PassiveServerMediaSubsession::createNew(*sessionState.sink, sessionState.rtcpInstance));
   sessionState.rtspServer->addServerMediaSession(sms);
-
-  char* url = sessionState.rtspServer->rtspURL(sms);
-  *env << "Play this stream using the URL \"" << url << "\"\n";
-  delete[] url;
+  announceURL(sessionState.rtspServer, sms);
 
   // Finally, start the streaming:
   *env << "Beginning streaming...\n";

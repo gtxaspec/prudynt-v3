@@ -19,7 +19,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // main program
 
 #include "liveMedia.hh"
+
 #include "BasicUsageEnvironment.hh"
+#include "announceURL.hh"
 #include "GroupsockHelper.hh"
 
 // Uncomment the following if the input file is a MPEG Program Stream
@@ -28,11 +30,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 // To stream using "source-specific multicast" (SSM), uncomment the following:
 //#define USE_SSM 1
-#ifdef USE_SSM
-Boolean const isSSM = True;
-#else
-Boolean const isSSM = False;
-#endif
+
+// To stream using IPv6 multicast, rather than IPv4 multicast, uncomment the following:
+//#define USE_IPV6_MULTICAST 1
 
 // To set up an internal RTSP server, uncomment the following:
 //#define IMPLEMENT_RTSP_SERVER 1
@@ -41,6 +41,12 @@ Boolean const isSSM = False;
 // To stream *only* MPEG "I" frames (e.g., to reduce network bandwidth),
 // change the following "False" to "True":
 Boolean iFramesOnly = False;
+
+#ifdef USE_SSM
+Boolean const isSSM = True;
+#else
+Boolean const isSSM = False;
+#endif
 
 UsageEnvironment* env;
 char const* inputFileName = "test.mpg";
@@ -103,10 +109,7 @@ int main(int argc, char** argv) {
   // Note: This starts RTCP running automatically
 
 #ifdef IMPLEMENT_RTSP_SERVER
-  RTSPServer* rtspServer = RTSPServer::createNew(*env);
-  // Note that this (attempts to) start a server on the default RTSP server
-  // port: 554.  To use a different port number, add it as an extra
-  // (optional) parameter to the "RTSPServer::createNew()" call above.
+  RTSPServer* rtspServer = RTSPServer::createNew(*env, 8554);
   if (rtspServer == NULL) {
     *env << "Failed to create RTSP server: " << env->getResultMsg() << "\n";
     exit(1);
@@ -117,10 +120,7 @@ int main(int argc, char** argv) {
 					   isSSM);
   sms->addSubsession(PassiveServerMediaSubsession::createNew(*videoSink, rtcp));
   rtspServer->addServerMediaSession(sms);
-
-  char* url = rtspServer->rtspURL(sms);
-  *env << "Play this stream using the URL \"" << url << "\"\n";
-  delete[] url;
+  announceURL(rtspServer, sms);
 #endif
 
   // Finally, start the streaming:

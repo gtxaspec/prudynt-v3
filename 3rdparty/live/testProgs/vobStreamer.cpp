@@ -20,8 +20,10 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // main program
 
 #include "liveMedia.hh"
+
 #include "AC3AudioStreamFramer.hh"
 #include "BasicUsageEnvironment.hh"
+#include "announceURL.hh"
 #include "GroupsockHelper.hh"
 
 char const* programName;
@@ -209,11 +211,7 @@ int main(int argc, char const** argv) {
     rtspServer->addServerMediaSession(sms);
 
     *env << "Created RTSP server.\n";
-
-    // Display our "rtsp://" URL, for clients to connect to:
-    char* url = rtspServer->rtspURL(sms);
-    *env << "Access this stream using the URL:\n\t" << url << "\n";
-    delete[] url;
+    announceURL(rtspServer, sms);
   }
 
   // Finally, start the streaming:

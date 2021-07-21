@@ -244,6 +244,7 @@ void RTSPServer
     ParamsForREGISTER* registerParams = new ParamsForREGISTER(cmd, this, url, urlSuffix, reuseConnection, deliverViaTCP, proxyURLSuffix);
     envir().taskScheduler().scheduleDelayedTask(reuseConnection ? DELAY_USECS_AFTER_REGISTER_RESPONSE : 0,
 						(TaskFunc*)continueHandlingREGISTER, registerParams);
+    ++fScheduledDelayedTask;
   } else if (responseStr != NULL) {
     setRTSPResponse(responseStr);
     delete[] responseStr;
@@ -298,6 +299,8 @@ void RTSPServer::RTSPClientConnection::continueHandlingREGISTER(ParamsForREGISTE
 }
 
 void RTSPServer::RTSPClientConnection::continueHandlingREGISTER1(ParamsForREGISTER* params) {
+  --fScheduledDelayedTask;
+
   // Reuse our socket if requested:
   int socketNumToBackEndServer = params->fReuseConnection ? fClientOutputSocket : -1;
 
@@ -308,6 +311,8 @@ void RTSPServer::RTSPClientConnection::continueHandlingREGISTER1(ParamsForREGIST
     // "RTSPClientConnection" object.  We do this now, in case the "implementCmd_REGISTER()" call below would also end up
     // deleting this.
     fClientInputSocket = fClientOutputSocket = -1; // so the socket doesn't get closed when we get deleted
+    delete this;
+  } else if (!fIsActive && fRecursionCount <= 0 && fScheduledDelayedTask <= 0) {
     delete this;
   }
   
