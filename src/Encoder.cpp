@@ -329,7 +329,7 @@ void Encoder::run() {
                 }
             }
         }
-        osd.update();
+        //osd.update();
         IMP_Encoder_ReleaseStream(0, &stream);
     }
     IMP_Encoder_StopRecvPic(0);
