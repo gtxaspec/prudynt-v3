@@ -35,6 +35,7 @@ void IMPDeviceSource::doGetNextFrame() {
         fFrameSize = nal.data.size();
     }
     fPresentationTime = nal.time;
+    fDurationInMicroseconds = nal.duration;
     memcpy(fTo, &nal.data[0], fFrameSize);
 
     FramedSource::afterGetting(this);

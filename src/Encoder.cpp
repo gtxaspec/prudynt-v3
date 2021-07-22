@@ -266,7 +266,6 @@ void Encoder::run() {
         if (nal_ts - last_nal_ts > 1.5*(1000000/IMP::FRAME_RATE)) {
             LOG_WARN("The encoder dropped a frame.");
         }
-        last_nal_ts = nal_ts;
         struct timeval encode_time;
         encode_time.tv_sec  = nal_ts / 1000000;
         encode_time.tv_usec = nal_ts % 1000000;
@@ -304,6 +303,10 @@ void Encoder::run() {
             H264NALUnit nalu;
             nalu.imp_ts = stream.pack[i].timestamp;
             timeradd(&imp_time_base, &encode_time, &nalu.time);
+            nalu.duration = 0;
+            if (stream.pack[i].dataType.h264Type == 5 || stream.pack[i].dataType.h264Type == 1) {
+                nalu.duration = last_nal_ts - nal_ts;
+            }
             //We use start+4 because the encoder inserts 4-byte MPEG
             //'startcodes' at the beginning of each NAL. Live555 complains
             //if those are present.
@@ -331,6 +334,7 @@ void Encoder::run() {
         }
         //osd.update();
         IMP_Encoder_ReleaseStream(0, &stream);
+        last_nal_ts = nal_ts;
     }
     IMP_Encoder_StopRecvPic(0);
 }

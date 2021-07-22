@@ -17,6 +17,7 @@ struct H264NALUnit {
     std::vector<uint8_t> data;
     struct timeval time;
     int64_t imp_ts;
+    int64_t duration;
 };
 
 struct EncoderSink {
