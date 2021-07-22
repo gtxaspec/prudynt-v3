@@ -29,6 +29,42 @@ int OSD::freetype_init() {
         96,
         96
     );
+
+    FT_Stroker_Set(
+        stroker,
+        3*64,
+        FT_STROKER_LINECAP_SQUARE,
+        FT_STROKER_LINEJOIN_ROUND,
+        0
+    );
+    FT_Set_Char_Size(fontface, 0, 32*64, 96, 96);
+
+    //Prerender glyphs needed for displaying date & time.
+    std::string prerender_list = "0123456789 /APM:";
+    for (unsigned int i = 0; i < prerender_list.length(); ++i) {
+        FT_UInt gindex = FT_Get_Char_Index(fontface, prerender_list[i]);
+        FT_Load_Glyph(fontface, gindex, FT_LOAD_DEFAULT);
+        FT_Glyph glyph;
+        FT_Get_Glyph(fontface->glyph, &glyph);
+        FT_Glyph stroked;
+        FT_Get_Glyph(fontface->glyph, &stroked);
+
+        FT_Glyph_StrokeBorder(&stroked, stroker, false, true);
+
+        FT_BBox bbox;
+        FT_Glyph_Get_CBox(stroked, FT_GLYPH_BBOX_PIXELS, &bbox);
+        boxes[prerender_list[i]] = bbox;
+        advances[prerender_list[i]] = stroked->advance;
+
+        FT_Glyph_To_Bitmap(&stroked, FT_RENDER_MODE_NORMAL, NULL, true);
+        FT_BitmapGlyph strokeBMG = (FT_BitmapGlyph)stroked;
+        stroke_bitmaps[prerender_list[i]] = strokeBMG;
+
+        FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, NULL, true);
+        FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
+        bitmaps[prerender_list[i]] = bitmapGlyph;
+    }
+
     return 0;
 }
 
@@ -97,33 +133,17 @@ void OSD::draw_glyph(OSDTextItem *ti, FT_BitmapGlyph bmg,
 
 void OSD::set_text(OSDTextItem *ti, std::string text) {
     ti->text = text;
-    FT_Stroker_Set(
-        stroker,
-        ti->stroke*64,
-        FT_STROKER_LINECAP_SQUARE,
-        FT_STROKER_LINEJOIN_ROUND,
-        0
-    );
-    FT_Set_Char_Size(fontface, 0, ti->point_size*64, 96, 96);
 
     //First, calculate the size of the bitmap surface we need
     int item_width = 0, item_height = 0;
     FT_BBox total_bbox = {0,0,0,0};
     for (unsigned int i = 0; i < ti->text.length(); ++i) {
-        FT_UInt gindex = FT_Get_Char_Index(fontface, ti->text[i]);
-        FT_Load_Glyph(fontface, gindex, FT_LOAD_DEFAULT);
-        FT_Glyph glyph;
-        FT_Get_Glyph(fontface->glyph, &glyph);
-        FT_Glyph_StrokeBorder(&glyph, stroker, false, true);
-
-        FT_BBox bbox;
-        FT_Glyph_Get_CBox(glyph, FT_GLYPH_BBOX_PIXELS, &bbox);
-        FT_Done_Glyph(glyph);
+        FT_BBox bbox = boxes[ti->text[i]];
 
         if (i+1 == ti->text.length())
             item_width += bbox.xMax - bbox.xMin;
         else
-            item_width += glyph->advance.x >> 16;
+            item_width += advances[ti->text[i]].x >> 16;
 
         if (bbox.yMin < total_bbox.yMin)
             total_bbox.yMin = bbox.yMin;
@@ -155,27 +175,11 @@ void OSD::set_text(OSDTextItem *ti, std::string text) {
 
     //Then, render the stroke & text
     for (unsigned int i = 0; i < ti->text.length(); ++i) {
-        FT_UInt gindex = FT_Get_Char_Index(fontface, ti->text[i]);
-        FT_Load_Glyph(fontface, gindex, FT_LOAD_DEFAULT);
-        FT_Glyph glyph;
-        FT_Get_Glyph(fontface->glyph, &glyph);
-        FT_Glyph stroked;
-        FT_Get_Glyph(fontface->glyph, &stroked);
-
-        FT_Glyph_StrokeBorder(&stroked, stroker, false, true);
-
         int cpx = pen_x;
         int cpy = pen_y;
 
-        FT_Glyph_To_Bitmap(&stroked, FT_RENDER_MODE_NORMAL, NULL, true);
-        FT_BitmapGlyph strokeBMG = (FT_BitmapGlyph)stroked;
-        draw_glyph(ti, strokeBMG, &cpx, &cpy, item_height, item_width, 0x0);
-        FT_Done_Glyph(stroked);
-
-        FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, NULL, true);
-        FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
-        draw_glyph(ti, bitmapGlyph, &pen_x, &pen_y, item_height, item_width, 0xFFFFFFFF);
-        FT_Done_Glyph(glyph);
+        draw_glyph(ti, stroke_bitmaps[ti->text[i]], &cpx, &cpy, item_height, item_width, 0x0);
+        draw_glyph(ti, bitmaps[ti->text[i]], &pen_x, &pen_y, item_height, item_width, 0xFFFFFFFF);
     }
 }
 

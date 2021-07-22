@@ -1,6 +1,8 @@
 #ifndef OSD_hpp
 #define OSD_hpp
 
+#include <map>
+
 #include <imp/imp_osd.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -36,6 +38,11 @@ private:
 
     OSDTextItem timestamp;
     time_t last_ts_time;
+
+    std::map<char,FT_BitmapGlyph> bitmaps;
+    std::map<char,FT_BitmapGlyph> stroke_bitmaps;
+    std::map<char,FT_BBox> boxes;
+    std::map<char,FT_Vector> advances;
 };
 
 #endif
