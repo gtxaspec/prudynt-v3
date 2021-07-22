@@ -332,7 +332,7 @@ void Encoder::run() {
                 }
             }
         }
-        //osd.update();
+        osd.update();
         IMP_Encoder_ReleaseStream(0, &stream);
         last_nal_ts = nal_ts;
     }
