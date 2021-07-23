@@ -62,6 +62,10 @@ private:
     OSD osd;
 
     DayMode day_mode;
+    int day_mode_change = 0;
+    time_t last_mode_change = 0;
+    bool ir_leds_on = false;
+
     int system_init();
     int framesource_init();
     int encoder_init();
