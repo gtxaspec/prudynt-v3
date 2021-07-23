@@ -198,6 +198,14 @@ void Encoder::set_day_mode(DayMode mode) {
         IMP_ISP_Tuning_SetBrightness(128);
         IMP_ISP_Tuning_SetSaturation(150);
 
+        IMPISPSinterDenoiseAttr noise;
+        noise.type = IMPISP_TUNING_OPS_TYPE_AUTO;
+        noise.enable = IMPISP_TUNING_OPS_MODE_DISABLE;
+        noise.sinter_strength = 0x35;
+        noise.sval_max = 0xFF;
+        noise.sval_min = 0x60;
+        IMP_ISP_Tuning_SetSinterDnsAttr(&noise);
+
         //WAS manual 0x50
         //IMO anything above 0x50 produces an unacceptable amount of
         //ghosting.
@@ -225,8 +233,11 @@ void Encoder::set_day_mode(DayMode mode) {
         //IMP_ISP_Tuning_SetAeComp(120);
 
         IMPISPSinterDenoiseAttr noise;
-        noise.type = IMPISP_TUNING_OPS_TYPE_AUTO;
+        noise.type = IMPISP_TUNING_OPS_TYPE_MANUAL;
         noise.enable = IMPISP_TUNING_OPS_MODE_ENABLE;
+        noise.sinter_strength = 0x35;
+        noise.sval_max = 0xFF;
+        noise.sval_min = 0x60;
         IMP_ISP_Tuning_SetSinterDnsAttr(&noise);
 
         IMPISPTemperDenoiseAttr temp;
