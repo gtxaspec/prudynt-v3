@@ -346,7 +346,7 @@ void Encoder::run() {
         IMPISPEVAttr ev;
         IMP_ISP_Tuning_GetEVAttr(&ev);
         time_t now = time(NULL);
-        if (now - last_mode_change > 10) {
+        if (now - last_mode_change > 60*3) {
             if (day_mode == DAY_MODE_DAY) {
                 if (ev.ev_log2 >= 1210000) {
                     ++day_mode_change;
