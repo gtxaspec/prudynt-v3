@@ -89,6 +89,7 @@ typedef enum {
 	OSD_REG_BITMAP		= 3, /**< 点阵图片 */
 	OSD_REG_COVER		= 4, /**< 矩形遮挡 */
 	OSD_REG_PIC			= 5, /**< 图片，适合用作Logo或时间戳 */
+	OSD_REG_PIC_RMEM	= 6, /**< 图片，适合用作Logo或时间戳, 使用RMEM内存 */
 } IMPOsdRgnType;
 
 /**

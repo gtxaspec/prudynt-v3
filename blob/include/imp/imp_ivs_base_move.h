@@ -14,7 +14,7 @@ extern "C"
 #endif
 #endif /* __cplusplus */
 
-#define IMP_IVS_MOVE_MAX_ROI_CNT		16
+#define IMP_IVS_MOVE_MAX_ROI_CNT	52
 
 #include <imp/imp_ivs.h>
 
@@ -49,6 +49,7 @@ typedef struct {
 	int ret;
 	uint8_t* data;
 	int datalen;
+	int64_t timeStamp;	/**< 帧的时间戳 */
 } IMP_IVS_BaseMoveOutput;
 
 /**

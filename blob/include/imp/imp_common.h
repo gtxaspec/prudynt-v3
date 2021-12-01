@@ -82,6 +82,7 @@ typedef struct {
 typedef enum {
 	PT_JPEG,					/**< JPEG图像协议类型 */
 	PT_H264,					/**< H264视频协议类型 */
+	PT_H265,					/**< H265视频协议类型 */
 } IMPPayloadType;
 
 /**
@@ -176,8 +177,6 @@ static inline int calc_pic_size(int width, int height, IMPPixelFormat imp_pixfmt
 		BPP(PIX_FMT_RGB565BE, 2, 1);
 		BPP(PIX_FMT_BGR0, 4, 1);
 		BPP(PIX_FMT_BGR24, 3, 1);
-		BPP(PIX_FMT_HSV, 4, 1);
-		BPP(PIX_FMT_BGRA, 4, 1);
 	default: break;
 	}
 #undef BPP

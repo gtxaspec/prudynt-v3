@@ -93,6 +93,7 @@ typedef enum {
 	AUDIO_SAMPLE_RATE_8000	= 8000,		/**< 8KHz采样率 */
 	AUDIO_SAMPLE_RATE_16000 = 16000,	/**< 16KHz采样率 */
 	AUDIO_SAMPLE_RATE_24000 = 24000,	/**< 24KHz采样率 */
+	AUDIO_SAMPLE_RATE_32000 = 32000,	/**< 32KHz采样率 */
 	AUDIO_SAMPLE_RATE_44100 = 44100,	/**< 44.1KHz采样率 */
 	AUDIO_SAMPLE_RATE_48000 = 48000,	/**< 48KHz采样率 */
 	AUDIO_SAMPLE_RATE_96000 = 96000,	/**< 96KHz采样率 */
@@ -1482,7 +1483,7 @@ int IMP_ADEC_ReleaseStream(int adChn,IMPAudioStream *stream);
  *
  * @param[in] audioDevId 音频输入设备号.
  * @param[in] aiChn 音频输入通道号.
- * @param[out] aiGain 音频输入增益,范围[0 ~ 31].
+ * @param[out] aiGain 音频输入增益,范围[0 ~ 31],对应[-18dB ~ 28.5dB],步长1.5dB.
  *
  * @retval 0 成功.
  * @retval 非0 失败.
@@ -1514,13 +1515,51 @@ int IMP_ADEC_ReleaseStream(int adChn,IMPAudioStream *stream);
  int IMP_AI_GetGain(int audioDevId, int aiChn, int *aiGain);
 
 /**
+ * @fn int IMP_AI_SetAlcGain(int audioDevId, int aiChn, int aiPgaGain)
+ *
+ * 设置音频输入增益.
+ *
+ * @param[in] audioDevId 音频输入设备号.
+ * @param[in] aiChn 音频输入通道号.
+ * @param[out] aiPgaGain 音频输入增益,范围[0 ~ 7],对应[-13.5dB, +28.5dB].步长6dB.
+ *
+ * @retval 0 成功.
+ * @retval 非0 失败.
+ *
+ * @remarks 无.
+ *
+ * @attention aiPgaGain的范围为[0 ~ 7],如果输入的值小于0,则aiPgaGain的值将会\n
+ * 被设置为0.如果值大于7,aiGain的值会被设置为7.
+ *
+ */
+ int IMP_AI_SetAlcGain(int audioDevId, int aiChn, int aiPgaGain);
+
+/**
+ * @fn int IMP_AI_GetAlcGain(int audioDevId, int aiChn, int *aiPgaGain)
+ *
+ * 获取AIPga增益值.
+ *
+ * @param[in] audioDevId 音频输入设备号.
+ * @param[in] aiChn 音频输入通道号.
+ * @param[out] aiPgaGain 音频输入增益.
+ *
+ * @retval 0 成功.
+ * @retval 非0 失败.
+ *
+ * @remarks 无.
+ *
+ * @attention 无.
+ */
+ int IMP_AI_GetAlcGain(int audioDevId, int aiChn, int *aiPgaGain);
+
+/**
  * @fn int IMP_AO_SetGain(int audioDevId, int aoChn, int aoGain)
  *
  * 设置音频输出增益.
  *
  * @param[in] audioDevId 音频输出设备号.
  * @param[in] aoChn 音频输出通道号.
- * @param[out] aoGain 音频输出增益,范围[0 ~ 0xcb].
+ * @param[out] aoGain 音频输出增益,范围[0 ~ 0x1f],对应[-39dB ~ 6dB],步长1.5dB.
  *
  * @retval 0 成功.
  * @retval 非0 失败.

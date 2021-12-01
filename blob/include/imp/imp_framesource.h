@@ -138,6 +138,7 @@ typedef struct {
 	int outFrmRateDen;			/**< 通道的输出帧率分母 */
 	int nrVBs;					/**< Video buffer数量 */
 	IMPFSChnType type;			/**< 通道类型 */
+	IMPFSChnCrop fcrop;			/**< 图片裁剪属性 */
 } IMPFSChnAttr;
 
 /**
@@ -206,6 +207,24 @@ int IMP_FrameSource_EnableChn(int chnNum);
  * @attention 无
  */
 int IMP_FrameSource_DisableChn(int chnNum);
+
+/**
+ * @fn int IMP_FrameSource_SetSource(int extchnNum, int sourcechnNum)
+ *
+ * 指定扩展通道源通道接口
+ *
+ * @param[in] extchnNum 扩展通道号
+ *
+ * @param[in] sourcechnNum 源通道号
+ *
+ * @retval 0 成功
+ * @retval 非0 失败，返回错误码
+ *
+ * @remark 无
+ *
+ * @attention 在IMP_FrameSource_CreateChn之后, IMP_FrameSource_EnableChn之前调用
+ */
+int IMP_FrameSource_SetSource(int extchnNum, int sourcechnNum);
 
 /**
  * @fn int IMP_FrameSource_GetChnAttr(int chnNum, IMPFSChnAttr *chnAttr)
