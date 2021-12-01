@@ -10,12 +10,14 @@ class IMPServerMediaSubsession: public OnDemandServerMediaSubsession {
 public:
     static IMPServerMediaSubsession* createNew(
         UsageEnvironment& env,
+        H264NALUnit vps,
         H264NALUnit sps,
         H264NALUnit pps
     );
 protected:
     IMPServerMediaSubsession(
         UsageEnvironment& env,
+        H264NALUnit vps,
         H264NALUnit sps,
         H264NALUnit pps
     );
@@ -34,7 +36,7 @@ protected:
 
 private:
     StreamReplicator *replicator;
-    H264NALUnit sps, pps;
+    H264NALUnit vps, sps, pps;
 };
 
 #endif

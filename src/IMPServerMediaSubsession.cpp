@@ -1,24 +1,26 @@
 #include <iostream>
 #include "IMPServerMediaSubsession.hpp"
 #include "IMPDeviceSource.hpp"
-#include "H264VideoRTPSink.hh"
-#include "H264VideoStreamDiscreteFramer.hh"
+#include "H265VideoRTPSink.hh"
+#include "H265VideoStreamDiscreteFramer.hh"
 #include "GroupsockHelper.hh"
 
 IMPServerMediaSubsession* IMPServerMediaSubsession::createNew(
     UsageEnvironment& env,
+    H264NALUnit vps,
     H264NALUnit sps,
     H264NALUnit pps
 ) {
-    return new IMPServerMediaSubsession(env, sps, pps);
+    return new IMPServerMediaSubsession(env, vps, sps, pps);
 }
 
 IMPServerMediaSubsession::IMPServerMediaSubsession(
     UsageEnvironment& env,
+    H264NALUnit vps,
     H264NALUnit sps,
     H264NALUnit pps)
     : OnDemandServerMediaSubsession(env, false),
-      sps(sps), pps(pps)
+      vps(vps), sps(sps), pps(pps)
 {
 
 }
@@ -35,7 +37,7 @@ FramedSource* IMPServerMediaSubsession::createNewStreamSource(
     estBitrate = 5000;
 
     IMPDeviceSource *imp = IMPDeviceSource::createNew(envir());
-    return H264VideoStreamDiscreteFramer::createNew(envir(), imp, false, false);
+    return H265VideoStreamDiscreteFramer::createNew(envir(), imp, false, false);
 }
 
 RTPSink *IMPServerMediaSubsession::createNewRTPSink(
@@ -44,10 +46,12 @@ RTPSink *IMPServerMediaSubsession::createNewRTPSink(
     FramedSource* fs
 ) {
     increaseSendBufferTo(envir(), rtpGroupsock->socketNum(), 300*1024);
-    return H264VideoRTPSink::createNew(
+    return H265VideoRTPSink::createNew(
         envir(),
         rtpGroupsock,
         rtpPayloadTypeIfDynamic,
+        &vps.data[0],
+        vps.data.size(),
         &sps.data[0],
         sps.data.size(),
         &pps.data[0],
