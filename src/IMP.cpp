@@ -4,15 +4,8 @@
 
 const int IMP::FRAME_RATE = 12;
 
-extern "C" {
-    extern int IMP_OSD_SetPoolSize(int newPoolSize);
-    extern int IMP_Encoder_SetPoolSize(int newPoolSize0);
-}
-
 bool IMP::init() {
     int ret;
-    IMP_Encoder_SetPoolSize(0x100000);
-    IMP_OSD_SetPoolSize(0x65000);
 
     ret = system_init();
     if (ret < 0) {
@@ -33,12 +26,12 @@ bool IMP::init() {
 IMPSensorInfo IMP::create_sensor_info(std::string sensor) {
     IMPSensorInfo out;
     memset(&out, 0, sizeof(IMPSensorInfo));
-    //if (sensor.compare("jxf23") == 0) {
-    std::cout << "Choosing JXF23" << std::endl;
-        std::strcpy(out.name, "jxf23");
+    //if (sensor.compare("gc2053") == 0) {
+    std::cout << "Choosing GC2053" << std::endl;
+        std::strcpy(out.name, "gc2053");
         out.cbus_type = TX_SENSOR_CONTROL_INTERFACE_I2C;
-        std::strcpy(out.i2c.type, "jxf23");
-        out.i2c.addr = 0x40;
+        std::strcpy(out.i2c.type, "gc2053");
+        out.i2c.addr = 0x37;
         return out;
     //}
 }
@@ -114,7 +107,7 @@ int IMP::system_init() {
     }
     std::cout << "ISP Opened" << std::endl;
 
-    IMPSensorInfo sinfo = create_sensor_info("jxf23");
+    IMPSensorInfo sinfo = create_sensor_info("gc2053");
     ret = IMP_ISP_AddSensor(&sinfo);
     if (ret < 0) {
         std::cout << "Error: IMP_ISP_AddSensor() == " << ret << std::endl;
