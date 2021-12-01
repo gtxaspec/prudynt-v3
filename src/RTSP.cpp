@@ -19,27 +19,36 @@ void RTSP::run() {
     OutPacketBuffer::maxSize = 500000;
 
     int sink_id = Encoder::connect_sink(this, "SPSPPS");
-    H264NALUnit sps, pps;
-    bool have_pps = false, have_sps = false;
+    H264NALUnit sps, pps, vps;
+    bool have_pps = false, have_sps = false, have_vps = false;
     //Read from the stream until we capture the SPS and PPS.
-    while (!have_pps || !have_sps) {
+    while (!have_vps || !have_pps || !have_sps) {
         H264NALUnit unit = encoder->wait_read();
-        if ((unit.data[0] & 0x1F) == 7) {
+        uint8_t nalType = (unit.data[0] & 0x7E) >> 1;
+        if (nalType == 33) {
+            LOG_INFO("Got SPS");
             sps = unit;
             have_sps = true;
         }
-        if ((unit.data[0] & 0x1F) == 8) {
+        if (nalType == 34) {
+            LOG_INFO("Got PPS");
             pps = unit;
             have_pps = true;
         }
+        if (nalType == 32) {
+            LOG_INFO("Got VPS");
+            vps = unit;
+            have_vps = true;
+        }
     }
     Encoder::remove_sink(sink_id);
+    LOG_INFO("Got VPS, PPS, & SPS.");
 
     ServerMediaSession *sms = ServerMediaSession::createNew(
         *env, "unicast", "Main", "Wyzecam"
     );
     IMPServerMediaSubsession *sub = IMPServerMediaSubsession::createNew(
-        *env, sps, pps
+        *env, vps, sps, pps
     );
     sms->addSubsession(sub);
     rtspServer->addServerMediaSession(sms);
