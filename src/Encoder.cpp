@@ -89,8 +89,8 @@ int Encoder::encoder_init() {
 
     IMP_Encoder_SetDefaultParam(
         &channel_attr, IMP_ENC_PROFILE_HEVC_MAIN, IMP_ENC_RC_MODE_VBR, 1920, 1080,
-        IMP::FRAME_RATE, 1, IMP::FRAME_RATE * 2, 2,
-        -1, 2500
+        IMP::FRAME_RATE, 1, IMP::FRAME_RATE * 2, 1,
+        -1, 1000
     );
 
     ret = IMP_Encoder_CreateChn(0, &channel_attr);
