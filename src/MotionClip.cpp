@@ -1,21 +1,11 @@
 #include "MotionClip.hpp"
 #include "IMP.hpp"
+#include "MotionMP4Mux.hpp"
 
-#include <libavutil/log.h>
 #include <fstream>
 
 extern "C" {
     #include <unistd.h>
-}
-
-void post_motion(std::string clip_path) {
-    std::ifstream script_test("/home/wyze/scripts/post_motion", std::ifstream::in);
-    if (!script_test.fail()) {
-        char cmd[512];
-        snprintf(cmd, 512, "/home/wyze/scripts/post_motion %s", clip_path.c_str());
-        system(cmd);
-        script_test.close();
-    }
 }
 
 std::shared_ptr<MotionClip> MotionClip::begin() {
@@ -30,125 +20,81 @@ MotionClip::MotionClip() {
     formatted[255] = '\0';
     clip_timestr = std::string(formatted);
 
-    clip_path = "/home/wyze/media/";
+    clip_path = "/home/wyze/media/partial/";
     clip_path += clip_timestr;
-    clip_path += ".part.ts";
+    clip_path += ".part.h265";
+
+    meta_path = "/home/wyze/media/partial/";
+    meta_path += clip_timestr;
+    meta_path += ".part.meta";
 
     LOG_DEBUG("Writing to " << clip_path);
-    av_log_set_level(AV_LOG_DEBUG);
-    avformat_alloc_output_context2(&oc, NULL, NULL, clip_path.c_str());
-    if (!oc) {
-        LOG_ERROR("Couldn't create output context");
+
+    clip_file = fopen(clip_path.c_str(), "w");
+    if (clip_file == NULL) {
+        LOG_ERROR("Could not open nal file");
         return;
     }
 
-    oc->oformat->video_codec = AV_CODEC_ID_H264;
-    vs = avformat_new_stream(oc, NULL);
-    vs->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
-    vs->codecpar->codec_id = AV_CODEC_ID_H264;
-    vs->codecpar->profile = FF_PROFILE_H264_HIGH;
-    vs->codecpar->width = 1920;
-    vs->codecpar->height = 1080;
-    vs->codecpar->format = AV_PIX_FMT_YUV420P;
-    vs->time_base.den = 900000;
-    vs->time_base.num = 1;
-    vs->avg_frame_rate.den = 1;
-    vs->avg_frame_rate.num = IMP::FRAME_RATE;
-    vs->r_frame_rate.den = 1;
-    vs->r_frame_rate.num = IMP::FRAME_RATE;
-    vs->pts_wrap_bits = 64;
-    vs->start_time = AV_NOPTS_VALUE;
+    meta_file = fopen(meta_path.c_str(), "w");
+    if (meta_file == NULL) {
+        LOG_ERROR("Could not open metadata file");
+        return;
+    }
 
-    if (avio_open(&oc->pb, clip_path.c_str(), AVIO_FLAG_WRITE) < 0) {
-        LOG_ERROR("Could not open file");
-        return;
-    }
-    if (avformat_write_header(oc, NULL) < 0) {
-        LOG_ERROR("Unable to write clip header");
-        return;
-    }
-    av_dump_format(oc, 0, clip_path.c_str(), 1);
+    files_ok = true;
 }
 
 void MotionClip::add_nal(H264NALUnit nal) {
-    if (!init_pts_set) {
-        initial_pts = nal.imp_ts;
-        init_pts_set = true;
+    NalMetadata m;
+    m.size = htole32(nal.data.size());
+    m.imp_ts = htole64(nal.imp_ts);
+
+    if (!files_ok) {
+        LOG_ERROR("Files are not open!");
+        return;
     }
 
-    nal_buffer.push_back(nal);
+    if (fwrite(&nal.data[0], nal.data.size(), 1, clip_file) != 1) {
+        LOG_ERROR("Failed to write NAL unit!");
+    }
+    if (fwrite(&m, sizeof(NalMetadata), 1, meta_file) != 1) {
+        LOG_ERROR("Failed to write NAL metadata!");
+    }
+    //could fsync here?
 }
 
 void MotionClip::write() {
-    uint8_t startcode[4] = { 0, 0, 0, 1 };
-    std::vector<uint8_t> naldata;
-    int64_t nal_ts = 0;
-    int res;
-
-    auto it = nal_buffer.begin();
-    //Find first iframe
-    while (it != nal_buffer.end()) {
-        if ((it->data[0] & 0x1F) == 5 || (it->data[0] & 0x1F) == 1) {
-            naldata.insert(naldata.end(), startcode, startcode + 4);
-            naldata.insert(naldata.end(), it->data.begin(), it->data.end());
-            nal_ts = it->imp_ts;
-            ++it;
-            break;
-        }
-        ++it;
+    if (!files_ok) {
+        return;
     }
-    while (true) {
-        if (it == nal_buffer.end())
-            break;
-
-        naldata.insert(naldata.end(), startcode, startcode + 4);
-        naldata.insert(naldata.end(), it->data.begin(), it->data.end());
-        nal_ts = it->imp_ts;
-
-        if ((it->data[0] & 0x1F) == 5 || (it->data[0] & 0x1F) == 1) {
-            AVPacket pkt;
-            av_init_packet(&pkt);
-            if ((it->data[0] & 0x1F) == 5)
-                pkt.flags |= AV_PKT_FLAG_KEY;
-            pkt.stream_index = vs->index;
-            pkt.data = &naldata[0];
-            pkt.size = naldata.size();
-            pkt.pts = nal_ts - initial_pts;
-            pkt.dts = nal_ts - initial_pts;
-            pkt.pos = -1;
-            pkt.duration = 1000000 / IMP::FRAME_RATE;
-            ++pts;
-            av_packet_rescale_ts(&pkt, {1, 1000000 }, vs->time_base);
-            res = av_write_frame(oc, &pkt);
-            if (res < 0) {
-                LOG_ERROR("Error muxing packet: " << res);
-            }
-
-            if (it == nal_buffer.end())
-                break;
-            //Reset naldata
-            naldata.clear();
-        }
-        ++it;
-    }
-    nal_buffer.clear();
-
-    av_write_trailer(oc);
-    avio_closep(&oc->pb);
-    avformat_free_context(oc);
+    fsync(fileno(clip_file));
+    fsync(fileno(meta_file));
+    fclose(clip_file);
+    fclose(meta_file);
+    files_ok = false;
 
     //Move motion clip to final & delete temp file
-    std::ifstream tmpfile(clip_path, std::ifstream::in);
-    std::string fin_path;
-    fin_path = "/home/wyze/media/";
-    fin_path += clip_timestr;
-    fin_path += ".ts";
-    std::ofstream finfile(fin_path, std::ofstream::out);
-    finfile << tmpfile.rdbuf();
-    finfile.close();
+    std::ifstream nal_tmpfile(clip_path, std::ifstream::in);
+    std::string nal_fin_path;
+    nal_fin_path = "/home/wyze/media/partial/";
+    nal_fin_path += clip_timestr;
+    nal_fin_path += ".h265";
+    std::ofstream nal_finfile(nal_fin_path, std::ofstream::out);
+    nal_finfile << nal_tmpfile.rdbuf();
+    nal_finfile.close();
     std::remove(clip_path.c_str());
 
-    //Execute post motion script
-    std::thread script_exe(post_motion, fin_path);
-    script_exe.detach();
+    //Move motion clip to final & delete temp file
+    std::ifstream meta_tmpfile(meta_path, std::ifstream::in);
+    std::string meta_fin_path;
+    meta_fin_path = "/home/wyze/media/partial/";
+    meta_fin_path += clip_timestr;
+    meta_fin_path += ".meta";
+    std::ofstream meta_finfile(meta_fin_path, std::ofstream::out);
+    meta_finfile << meta_tmpfile.rdbuf();
+    meta_finfile.close();
+    std::remove(meta_path.c_str());
+
+    MotionMP4Mux::mux(clip_timestr, nal_fin_path, meta_fin_path);
 }

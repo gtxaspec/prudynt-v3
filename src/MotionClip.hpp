@@ -9,6 +9,11 @@ extern "C" {
 #include <libavutil/timestamp.h>
 }
 
+struct NalMetadata {
+    uint32_t size;
+    int64_t imp_ts;
+} __attribute__((packed));
+
 class MotionClip {
 public:
     static std::shared_ptr<MotionClip> begin();
@@ -17,14 +22,12 @@ public:
 private:
     MotionClip();
 private:
+    FILE *clip_file;
+    FILE *meta_file;
     std::string clip_path;
+    std::string meta_path;
     std::string clip_timestr;
-    AVFormatContext* oc = NULL;
-    AVStream* vs = NULL;
-    std::vector<H264NALUnit> nal_buffer;
-    int pts = 0;
-    int64_t initial_pts;
-    bool init_pts_set = false;
+    bool files_ok = false;
 };
 
 #endif
