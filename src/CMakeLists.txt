@@ -10,6 +10,8 @@ set(WYZEDOM_SOURCE
   GPIO.cpp
   Motion.cpp
   MotionClip.cpp
+  MotionTSMux.cpp
+  MotionMP4Mux.cpp
 )
 
 add_executable(${PROJECT_NAME} ${WYZEDOM_SOURCE})
