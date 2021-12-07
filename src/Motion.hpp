@@ -53,7 +53,7 @@ private:
     std::list<H264NALUnit> nalus;
     //Contains pointers into the nalus list, tracking all
     //SPS nals. This is used to identify IDRs.
-    std::list<H264NALUnit*> sps;
+    std::list<H264NALUnit*> vps;
     std::shared_ptr<MsgChannel<H264NALUnit>> encoder;
     uint32_t sink_id;
 

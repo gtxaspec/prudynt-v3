@@ -70,7 +70,7 @@ bool Motion::init() {
     move_param.roiRect[0].p0.x = 0;
     move_param.roiRect[0].p0.y = 0;
     move_param.roiRect[0].p1.x = 1920 - 1;
-    move_param.roiRect[0].p1.y = 1080 - 1 - 0;
+    move_param.roiRect[0].p1.y = 1080 - 1;
     move_param.roiRectCnt = 1;
     move_intf = IMP_IVS_CreateMoveInterface(&move_param);
 
@@ -92,7 +92,7 @@ bool Motion::init() {
         return true;
     }
 
-    IMPCell fs = { DEV_ID_FS, 0, 0 };
+    IMPCell fs = { DEV_ID_FS, 0, 1 };
     IMPCell ivs_cell = { DEV_ID_IVS, 0, 0 };
     //Framesource -> IVS
     ret = IMP_System_Bind(&fs, &ivs_cell);
@@ -106,16 +106,16 @@ bool Motion::init() {
 void Motion::prebuffer(H264NALUnit &nal) {
     //Add the NALU to the end of the nalus list
     nalus.push_back(nal);
-    //If it was a SPS nal, add a reference to the sps list
-    if ((nal.data[0] & 0x1F) == 7) {
-        sps.push_back(&nalus.back());
+    //If it was a VPS nal, add a reference to the vps list
+    if (((nal.data[0] & 0x7E) >> 1) == 32) {
+        vps.push_back(&nalus.back());
     }
 
-    if (sps.size() > 1) {
+    if (vps.size() > 1) {
         int del = 0;
         struct timeval now, diff;
         gettimeofday(&now, NULL);
-        for (auto it = sps.begin(); it != sps.end(); ++it) {
+        for (auto it = vps.begin(); it != vps.end(); ++it) {
             timersub(&now, &(*it)->time, &diff);
             if (diff.tv_sec >= MOTION_PRE_TIME) {
                 ++del;
@@ -125,9 +125,9 @@ void Motion::prebuffer(H264NALUnit &nal) {
         //Pop H264NALUnits until we've deleted 'del' IDRs.
         while (del > 1) {
             nalus.pop_front();
-            if ((nalus.front().data[0] & 0x1F) == 7) {
-                //Pop off the SPS pointer
-                sps.pop_front();
+            if (((nalus.front().data[0] & 0x7E) >> 1) == 32) {
+                //Pop off the VPS pointer
+                vps.pop_front();
                 --del;
             }
         }
@@ -161,16 +161,16 @@ void Motion::run() {
             auto last_idr = nalus.begin();
             for (auto it = nalus.begin(); it != nalus.end(); ++it) {
                 clip->add_nal(*it);
-                if (((*it).data[0] & 0x1F) == 7) {
+                if ((((*it).data[0] & 0x7E) >> 1) == 32) {
                     last_idr = it;
                 }
             }
             //Clear all but the last IDR
-            if (sps.size() > 1) {
+            if (vps.size() > 1) {
                 nalus.erase(nalus.begin(), last_idr);
-                H264NALUnit* last_sps = sps.back();
-                sps.clear();
-                sps.push_back(last_sps);
+                H264NALUnit* last_vps = vps.back();
+                vps.clear();
+                vps.push_back(last_vps);
             }
         }
 
