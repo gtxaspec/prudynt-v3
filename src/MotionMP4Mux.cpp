@@ -32,6 +32,8 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
     avformat_alloc_output_context2(&oc, NULL, "mp4", clip.c_str());
     if (!oc) {
         LOG_ERROR("Couldn't create output context");
+        fclose(clip_file);
+        fclose(meta_file);
         return;
     }
 
@@ -54,10 +56,14 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
 
     if (avio_open(&oc->pb, tstmp_path.c_str(), AVIO_FLAG_WRITE) < 0) {
         LOG_ERROR("Could not open output file");
+        fclose(clip_file);
+        fclose(meta_file);
         return;
     }
     if (avformat_write_header(oc, NULL) < 0) {
         LOG_ERROR("Unable to write clip header");
+        fclose(clip_file);
+        fclose(meta_file);
         return;
     }
     av_dump_format(oc, 0, tstmp_path.c_str(), 1);
@@ -77,6 +83,8 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
         data[3] = 1;
         if (fread(&data[4], md.size, 1, clip_file) != 1) {
             LOG_ERROR("NAL data not readable from clip partial.");
+            fclose(clip_file);
+            fclose(meta_file);
             return;
         }
         naldata.insert(naldata.end(), data, data + md.size + 4);
@@ -110,6 +118,8 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
         LOG_ERROR("Clip contains no iframe! Something went wrong.");
     }
 
+    fclose(clip_file);
+    fclose(meta_file);
     av_write_trailer(oc);
     avio_closep(&oc->pb);
     avformat_free_context(oc);
