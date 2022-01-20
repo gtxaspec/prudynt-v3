@@ -96,7 +96,7 @@ void MotionTSMux::mux(std::string timestr, std::string clip, std::string meta) {
         }
 
         if (nalType == 19 || nalType == 20 || nalType == 1) {
-            AVPacket pkt;
+            AVPacket pkt = { 0 };
             av_init_packet(&pkt);
             if (nalType == 19 || nalType == 20)
                 pkt.flags |= AV_PKT_FLAG_KEY;
