@@ -196,43 +196,6 @@ void Encoder::run() {
         }
         osd.update();
         IMP_Encoder_ReleaseStream(0, &stream);
-
-        IMPISPEVAttr ev;
-        IMP_ISP_Tuning_GetEVAttr(&ev);
-        time_t now = time(NULL);
-        if (now - last_mode_change > 60*3) {
-            if (day_mode == DAY_MODE_DAY) {
-                if (ev.ev_log2 >= 1210000) {
-                    ++day_mode_change;
-                }
-                else {
-                    day_mode_change = 0;
-                }
-                if (day_mode_change > 10) {
-                    last_mode_change = now;
-                    day_mode_change = 0;
-                    LOG_INFO("Switching To Night Mode. Exp: " << ev.ev_log2);
-                    set_day_mode(DAY_MODE_NIGHT);
-                }
-            }
-            else {
-                //Night mode, switch to day
-                if (ev.ev_log2 < 670000 && ir_leds_on)
-                    ++day_mode_change;
-                else if (ev.ev_log2 < 1210000 && !ir_leds_on)
-                    ++day_mode_change;
-                else {
-                    day_mode_change = 0;
-                }
-                if (day_mode_change > 10) {
-                    last_mode_change = now;
-                    day_mode_change = 0;
-                    LOG_INFO("Switching To Day Mode. Exp: " << ev.ev_log2);
-                    set_day_mode(DAY_MODE_DAY);
-                }
-            }
-        }
-
         last_nal_ts = nal_ts;
     }
     IMP_Encoder_StopRecvPic(0);
