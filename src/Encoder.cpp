@@ -116,7 +116,7 @@ void Encoder::set_day_mode(DayMode mode) {
 
 	//Enable IR filter
 	GPIO::write(53, 0);
-	GPIO::write(52, 0);
+	GPIO::write(52, 1);
         ir_leds_on = false;
     }
     else {
