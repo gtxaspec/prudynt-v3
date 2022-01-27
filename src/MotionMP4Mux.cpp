@@ -2,6 +2,7 @@
 #include "Motion.hpp"
 #include "IMP.hpp"
 #include "Logger.hpp"
+#include "Scripts.hpp"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -141,4 +142,5 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
     std::remove(meta.c_str());
 
     //Execute post motion script
+    Scripts::motionClip(timestr, fin_path);
 }
