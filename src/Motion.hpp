@@ -37,7 +37,7 @@ public:
     static std::atomic<bool> indicator;
 private:
     static void detect_start(Motion *m);
-    static void write_clip(std::shared_ptr<MotionClip> mc);
+    static void write_clip(MotionClip *mc);
     void detect();
     void prebuffer(H264NALUnit &nal);
 private:
@@ -47,7 +47,7 @@ private:
     struct timeval move_time;
 
     //Motion clip recording
-    std::shared_ptr<MotionClip> clip = nullptr;
+    MotionClip *clip = nullptr;
 
     //Contains all NALs received from the encoder
     std::list<H264NALUnit> nalus;

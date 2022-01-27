@@ -8,8 +8,8 @@ extern "C" {
     #include <unistd.h>
 }
 
-std::shared_ptr<MotionClip> MotionClip::begin() {
-    return std::make_shared<MotionClip>(MotionClip());
+MotionClip* MotionClip::begin() {
+    return new MotionClip();
 }
 
 MotionClip::MotionClip() {

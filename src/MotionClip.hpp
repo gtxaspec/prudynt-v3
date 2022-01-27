@@ -16,7 +16,7 @@ struct NalMetadata {
 
 class MotionClip {
 public:
-    static std::shared_ptr<MotionClip> begin();
+    static MotionClip* begin();
     void add_nal(H264NALUnit nal);
     void write();
 private:

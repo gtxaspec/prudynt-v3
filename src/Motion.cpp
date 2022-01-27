@@ -5,7 +5,7 @@ std::atomic<bool> Motion::moving;
 std::atomic<bool> Motion::indicator;
 std::thread Motion::detect_thread;
 void Motion::detect_start(Motion *m) { m->detect(); }
-void Motion::write_clip(std::shared_ptr<MotionClip> mc) { mc->write(); }
+void Motion::write_clip(MotionClip *mc) { mc->write(); delete mc; }
 
 void Motion::detect() {
     LOG_INFO("Detection thread started");
@@ -151,7 +151,7 @@ void Motion::run() {
         }
         if (!Motion::moving && clip != nullptr) {
             //End of motion clip
-            std::thread(Motion::write_clip, std::move(clip)).detach();
+            std::thread(Motion::write_clip, clip).detach();
             clip = nullptr;
         }
         else if (Motion::moving && clip == nullptr) {
