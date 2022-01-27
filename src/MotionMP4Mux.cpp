@@ -133,6 +133,7 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
     std::ofstream finfile(fin_path, std::ofstream::out);
     finfile << tmpfile.rdbuf();
     finfile.close();
+    tmpfile.close();
     std::remove(tstmp_path.c_str());
     std::remove(clip.c_str());
     std::remove(meta.c_str());
