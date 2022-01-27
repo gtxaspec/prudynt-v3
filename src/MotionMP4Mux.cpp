@@ -21,6 +21,8 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
     FILE *meta_file = fopen(meta.c_str(), "r");
     if (clip_file == NULL || meta_file == NULL) {
         LOG_ERROR("Can't mux clip, partial files don't exist.");
+        if (clip_file) fclose(clip_file);
+        if (meta_file) fclose(meta_file);
         return;
     }
 
