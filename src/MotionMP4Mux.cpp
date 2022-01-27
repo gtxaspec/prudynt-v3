@@ -96,22 +96,22 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
         }
 
         if (nalType == 19 || nalType == 20 || nalType == 1) {
-            AVPacket pkt = { 0 };
-            av_init_packet(&pkt);
+            AVPacket *pkt = av_packet_alloc();
             if (nalType == 19 || nalType == 20)
-                pkt.flags |= AV_PKT_FLAG_KEY;
-            pkt.stream_index = vs->index;
-            pkt.data = naldata.data();
-            pkt.size = naldata.size();
-            pkt.pts = md.imp_ts - initial_pts;
-            pkt.dts = md.imp_ts - initial_pts;
-            pkt.pos = -1;
-            pkt.duration = 1000000 / IMP::FRAME_RATE;
-            av_packet_rescale_ts(&pkt, {1, 1000000}, vs->time_base);
-            if (av_write_frame(oc, &pkt) < 0) {
+                pkt->flags |= AV_PKT_FLAG_KEY;
+            pkt->stream_index = vs->index;
+            pkt->data = naldata.data();
+            pkt->size = naldata.size();
+            pkt->pts = md.imp_ts - initial_pts;
+            pkt->dts = md.imp_ts - initial_pts;
+            pkt->pos = -1;
+            pkt->duration = 1000000 / IMP::FRAME_RATE;
+            av_packet_rescale_ts(pkt, {1, 1000000}, vs->time_base);
+            if (av_write_frame(oc, pkt) < 0) {
                 LOG_ERROR("Error muxing packet");
             }
             naldata.clear();
+            av_packet_free(&pkt);
         }
     }
     if (!found_iframe) {
