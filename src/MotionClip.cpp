@@ -83,6 +83,7 @@ void MotionClip::write() {
     std::ofstream nal_finfile(nal_fin_path, std::ofstream::out);
     nal_finfile << nal_tmpfile.rdbuf();
     nal_finfile.close();
+    nal_tmpfile.close();
     std::remove(clip_path.c_str());
 
     //Move motion clip to final & delete temp file
@@ -94,6 +95,7 @@ void MotionClip::write() {
     std::ofstream meta_finfile(meta_fin_path, std::ofstream::out);
     meta_finfile << meta_tmpfile.rdbuf();
     meta_finfile.close();
+    meta_tmpfile.close();
     std::remove(meta_path.c_str());
 
     MotionMP4Mux::mux(clip_timestr, nal_fin_path, meta_fin_path);
