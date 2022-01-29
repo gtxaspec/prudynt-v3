@@ -19,6 +19,9 @@ MotionClip::MotionClip() {
     strftime(formatted, 256, "%Y-%m-%dT%H%M%S", ltime);
     formatted[255] = '\0';
     clip_timestr = std::string(formatted);
+    strftime(formatted, 256, "%s", ltime);
+    formatted[255] = '\0';
+    clip_timestamp = std::string(formatted);
 
     clip_path = "/home/wyze/media/partial/";
     clip_path += clip_timestr;
@@ -98,5 +101,5 @@ void MotionClip::write() {
     meta_tmpfile.close();
     std::remove(meta_path.c_str());
 
-    MotionMP4Mux::mux(clip_timestr, nal_fin_path, meta_fin_path);
+    MotionMP4Mux::mux(clip_timestamp, clip_timestr, nal_fin_path, meta_fin_path);
 }

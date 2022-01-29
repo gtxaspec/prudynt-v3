@@ -2,5 +2,5 @@
 
 class Scripts {
 public:
-    static int motionClip(std::string timestr, std::string clip_path);
+    static int motionClip(std::string ts, std::string clip_path);
 };

@@ -1,7 +1,7 @@
 #include "Scripts.hpp"
 #include "Logger.hpp"
 
-int Scripts::motionClip(std::string timestr, std::string clip_path) {
+int Scripts::motionClip(std::string ts, std::string clip_path) {
     LOG_DEBUG("Executing motionClip script.");
 
     int ret;
@@ -12,7 +12,7 @@ int Scripts::motionClip(std::string timestr, std::string clip_path) {
         512,
         "/home/wyze/scripts/motionClip %s %s",
         clip_path.c_str(),
-        timestr.c_str()
+        ts.c_str()
     );
 
     ret = system(formatted);

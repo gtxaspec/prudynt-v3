@@ -26,6 +26,7 @@ private:
     FILE *meta_file;
     std::string clip_path;
     std::string meta_path;
+    std::string clip_timestamp;
     std::string clip_timestr;
     bool files_ok = false;
 };

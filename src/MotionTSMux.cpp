@@ -12,7 +12,7 @@ extern "C" {
 
 #include <fstream>
 
-void MotionTSMux::mux(std::string timestr, std::string clip, std::string meta) {
+void MotionTSMux::mux(std::string ts, std::string timestr, std::string clip, std::string meta) {
     LOG_INFO("Muxing " << clip << " to MPEGTS.");
 
     AVFormatContext *oc = NULL;
@@ -142,5 +142,5 @@ void MotionTSMux::mux(std::string timestr, std::string clip, std::string meta) {
     std::remove(meta.c_str());
 
     //Execute post motion script
-    Scripts::motionClip(timestr, fin_path);
+    Scripts::motionClip(ts, fin_path);
 }

@@ -12,7 +12,7 @@ extern "C" {
 
 #include <fstream>
 
-void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) {
+void MotionMP4Mux::mux(std::string ts, std::string timestr, std::string clip, std::string meta) {
     LOG_INFO("Muxing " << clip << " to MP4.");
 
     AVFormatContext *oc = NULL;
@@ -142,5 +142,5 @@ void MotionMP4Mux::mux(std::string timestr, std::string clip, std::string meta) 
     std::remove(meta.c_str());
 
     //Execute post motion script
-    Scripts::motionClip(timestr, fin_path);
+    Scripts::motionClip(ts, fin_path);
 }
