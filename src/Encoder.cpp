@@ -114,9 +114,9 @@ void Encoder::set_day_mode(DayMode mode) {
         //Day mode sensor settings
         IMP_ISP_Tuning_SetISPRunningMode(IMPISP_RUNNING_MODE_DAY);
 
-	//Enable IR filter
-	GPIO::write(53, 0);
-	GPIO::write(52, 1);
+        //Enable IR filter
+        GPIO::write(53, 0);
+        GPIO::write(52, 1);
         ir_leds_on = false;
     }
     else {
