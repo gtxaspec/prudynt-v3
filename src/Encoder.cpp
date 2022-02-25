@@ -187,7 +187,7 @@ void Encoder::run() {
                     it->second.IDR = true;
                 }
                 if (it->second.IDR) {
-                    while (!it->second.chn->write(nalu)) {
+                    if (!it->second.chn->write(nalu)) {
                         //Discard old NALUs if our sinks aren't keeping up.
                         //This prevents the MsgChannels from clogging up with
                         //old data.
