@@ -12,8 +12,7 @@
 #include <memory>
 #include <sstream>
 #include <fstream>
-
-#include "MsgChannel.hpp"
+#include <mutex>
 
 struct LogMsg {
     LogMsg() {};
