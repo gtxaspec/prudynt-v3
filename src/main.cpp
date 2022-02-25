@@ -21,6 +21,8 @@ int main(int argc, const char *argv[]) {
         std::cout << "Logger initialization failed." << std::endl;
         return 1;
     }
+    LOG_INFO("Starting Prudynt Video Server.");
+
     if (IMP::init()) {
         std::cout << "IMP initialization failed." << std::endl;
         return 1;
