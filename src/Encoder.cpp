@@ -192,8 +192,8 @@ void Encoder::run() {
                         //This prevents the MsgChannels from clogging up with
                         //old data.
                         LOG_WARN("Sink " << it->second.name << " clogged! Discarding NAL.");
-                        H264NALUnit old_nal;
-                        it->second.chn->read(&old_nal);
+                        //H264NALUnit old_nal;
+                        //it->second.chn->read(&old_nal);
                     }
                 }
             }
