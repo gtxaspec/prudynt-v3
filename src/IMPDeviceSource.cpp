@@ -39,4 +39,5 @@ void IMPDeviceSource::doGetNextFrame() {
     memcpy(fTo, &nal.data[0], fFrameSize);
 
     FramedSource::afterGetting(this);
+    std::this_thread::yield();
 }

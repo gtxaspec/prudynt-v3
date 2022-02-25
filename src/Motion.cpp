@@ -181,6 +181,8 @@ void Motion::run() {
             last_time = cur;
         }
 #endif
+
+        std::this_thread::yield();
     }
 
     return;

@@ -201,6 +201,7 @@ void Encoder::run() {
         osd.update();
         IMP_Encoder_ReleaseStream(0, &stream);
         last_nal_ts = nal_ts;
+        std::this_thread::yield();
     }
     IMP_Encoder_StopRecvPic(0);
 }
