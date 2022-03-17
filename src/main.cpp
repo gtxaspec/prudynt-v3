@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <cunistd>
 
 #include "MsgChannel.hpp"
 #include "Encoder.hpp"
