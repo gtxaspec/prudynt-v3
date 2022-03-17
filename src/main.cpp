@@ -1,6 +1,5 @@
 #include <iostream>
 #include <thread>
-#include <cunistd>
 
 #include "MsgChannel.hpp"
 #include "Encoder.hpp"
@@ -23,7 +22,7 @@ bool timesync_wait() {
     // is time() == 0
     int timeout = 0;
     while (time(NULL) < 1647489843) {
-        sleep(1);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         ++timeout;
         if (timeout == 60)
             return false;
