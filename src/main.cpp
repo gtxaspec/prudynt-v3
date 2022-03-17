@@ -16,6 +16,20 @@ Encoder enc;
 RTSP rtsp;
 Motion motion;
 
+bool timesync_wait() {
+    // I don't really have a better way to do this than
+    // a no-earlier-than time. The most common sync failure
+    // is time() == 0
+    int timeout = 0;
+    while (time(NULL) < 1647489843) {
+        sleep(1);
+        ++timeout;
+        if (timeout == 60)
+            return false;
+    }
+    return true;
+}
+
 int main(int argc, const char *argv[]) {
     if (Logger::init()) {
         std::cout << "Logger initialization failed." << std::endl;
@@ -23,6 +37,10 @@ int main(int argc, const char *argv[]) {
     }
     LOG_INFO("Starting Prudynt Video Server.");
 
+    if (!timesync_wait()) {
+        std::cout << "Time is not synchronized." << std::endl;
+        return 1;
+    }
     if (IMP::init()) {
         std::cout << "IMP initialization failed." << std::endl;
         return 1;
