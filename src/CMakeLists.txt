@@ -37,6 +37,7 @@ target_link_libraries(${PROJECT_NAME}
   BasicUsageEnvironment
   UsageEnvironment
   freetype.a
+  lzma
   atomic
   avdevice
   avformat
