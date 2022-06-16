@@ -1,6 +1,10 @@
 #include <iostream>
 #include "Motion.hpp"
 
+extern "C" {
+    #include <unistd.h>
+}
+
 std::atomic<bool> Motion::moving;
 std::atomic<bool> Motion::indicator;
 std::thread Motion::detect_thread;
@@ -136,6 +140,7 @@ void Motion::prebuffer(H264NALUnit &nal) {
 
 void Motion::run() {
     LOG_INFO("Starting Motion Detector");
+    nice(-19);
 
     sink_id = Encoder::connect_sink(this, "Motion");
     Motion::moving = false;

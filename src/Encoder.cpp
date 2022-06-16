@@ -134,6 +134,10 @@ void Encoder::set_day_mode(DayMode mode) {
 void Encoder::run() {
     LOG_INFO("Encoder Start.");
 
+    //This is the most important thread in the process
+    //and likely the most important thread on the camera
+    nice(-20);
+
     int64_t last_nal_ts = 0;
 
     //The encoder tracks NAL timestamps with an int64_t.
