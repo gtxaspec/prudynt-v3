@@ -116,9 +116,8 @@ void Encoder::set_day_mode(DayMode mode) {
 
         //This may benefit from additional tuning
         //I found that 180 produces too much ghosting.
-        //The default is 128.
-        //140 looks acceptable to my eye.
-        IMP_ISP_Tuning_SetTemperStrength(140);
+        //135 looks acceptable to my eye.
+        IMP_ISP_Tuning_SetTemperStrength(135);
 
         //Enable IR filter
         GPIO::write(53, 0);
