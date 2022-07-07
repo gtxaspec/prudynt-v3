@@ -5,6 +5,7 @@
 #include "Encoder.hpp"
 #include "RTSP.hpp"
 #include "Motion.hpp"
+#include "CVR.hpp"
 #include "Logger.hpp"
 #include "IMP.hpp"
 
@@ -15,6 +16,7 @@ template <class T> void start_component(T c) {
 Encoder enc;
 RTSP rtsp;
 Motion motion;
+CVR cvr;
 
 bool timesync_wait() {
     // I don't really have a better way to do this than
@@ -53,13 +55,19 @@ int main(int argc, const char *argv[]) {
         std::cout << "Encoder initialization failed." << std::endl;
         return 1;
     }
+    if (cvr.init()) {
+        std::cout << "CVR initialization failed." << std::endl;
+        return 1;
+    }
 
     std::thread enc_thread(start_component<Encoder>, enc);
     std::thread rtsp_thread(start_component<RTSP>, rtsp);
     std::thread motion_thread(start_component<Motion>, motion);
+    //std::thread cvr_thread(start_component<CVR>, cvr);
 
     enc_thread.join();
     rtsp_thread.join();
     motion_thread.join();
+    //cvr_thread.join();
     return 0;
 }

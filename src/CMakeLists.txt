@@ -12,6 +12,7 @@ set(WYZEDOM_SOURCE
   MotionClip.cpp
   MotionTSMux.cpp
   MotionMP4Mux.cpp
+  CVR.cpp
   Scripts.cpp
 )
 
