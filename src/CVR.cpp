@@ -4,6 +4,8 @@ extern "C" {
     #include <unistd.h>
 }
 
+char startcode[] = { 0, 0, 0, 1 };
+
 bool CVR::init() {
     return false;
 }
@@ -30,6 +32,7 @@ void CVR::run() {
         }
 
         //Write nal to CVR file
+        cvr_stream.write(startcode, 4);
         cvr_stream.write((char*)&nal.data[0], nal.data.size());
         if (!cvr_stream.good()) {
             LOG_ERROR("Failed to write NALU to CVR stream");
