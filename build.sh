@@ -33,7 +33,7 @@ echo "Build ffmpeg"
 cd 3rdparty
 rm -rf ffmpeg
 if [[ ! -f ffmpeg-4.4.1.tar.xz ]]; then
-    wget 'https://ffmpeg.org/releases/ffmpeg-4.4.1.tar.xz'
+    wget 'https://web.archive.org/web/20220429132854if_/https://ffmpeg.org/releases/ffmpeg-4.4.1.tar.xz'
 fi
 tar xvf ffmpeg-4.4.1.tar.xz
 mv ffmpeg-4.4.1 ffmpeg
