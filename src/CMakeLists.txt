@@ -14,6 +14,7 @@ set(WYZEDOM_SOURCE
   MotionMP4Mux.cpp
   CVR.cpp
   Scripts.cpp
+  MuxQueue.cpp
 )
 
 add_executable(${PROJECT_NAME} ${WYZEDOM_SOURCE})

@@ -9,6 +9,8 @@
 
 #include "Encoder.hpp"
 #include "MotionClip.hpp"
+#include "MuxQueue.hpp"
+#include "ListQueue.hpp"
 
 //Maintain a prerecord buffer of (at least) this
 //many seconds. When a motion event occurs, the
@@ -37,13 +39,15 @@ public:
     static std::atomic<bool> indicator;
 private:
     static void detect_start(Motion *m);
-    static void write_clip(MotionClip *mc);
+    static void mux_queue_start(MuxQueue mq);
     void detect();
     void prebuffer(H264NALUnit &nal);
 private:
     IMP_IVS_MoveParam move_param;
     IMPIVSInterface *move_intf;
+    MuxQueue mux_queue;
     static std::thread detect_thread;
+    static std::thread mux_queue_thread;
     struct timeval move_time;
 
     //Motion clip recording

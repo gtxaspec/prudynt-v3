@@ -8,8 +8,9 @@ extern "C" {
 std::atomic<bool> Motion::moving;
 std::atomic<bool> Motion::indicator;
 std::thread Motion::detect_thread;
+std::thread Motion::mux_queue_thread;
 void Motion::detect_start(Motion *m) { m->detect(); }
-void Motion::write_clip(MotionClip *mc) { mc->write(); delete mc; }
+void Motion::mux_queue_start(MuxQueue mq) { mq.run(); }
 
 void Motion::detect() {
     LOG_INFO("Detection thread started");
@@ -146,6 +147,10 @@ void Motion::run() {
     Motion::moving = false;
     detect_thread = std::thread(Motion::detect_start, this);
 
+    std::shared_ptr<ListQueue<MotionClip*>> muxq_lq = std::make_shared<ListQueue<MotionClip*>>();
+    mux_queue.set_clip_source(muxq_lq);
+    mux_queue_thread = std::thread(Motion::mux_queue_start, mux_queue);
+
     H264NALUnit nal;
     while (true) {
         nal = encoder->wait_read();
@@ -156,7 +161,7 @@ void Motion::run() {
         }
         if (!Motion::moving && clip != nullptr) {
             //End of motion clip
-            std::thread(Motion::write_clip, clip).detach();
+            muxq_lq->write(clip);
             clip = nullptr;
         }
         else if (Motion::moving && clip == nullptr) {

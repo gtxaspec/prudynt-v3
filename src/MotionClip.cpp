@@ -71,11 +71,6 @@ void MotionClip::write() {
     if (!files_ok) {
         return;
     }
-    //We don't want to spend anything other than
-    //excess time on this thread. The encoder, motion,
-    //and rtsp threads are a lot more important.
-    nice(19);
-    std::this_thread::yield();
 
     fsync(fileno(clip_file));
     fsync(fileno(meta_file));
