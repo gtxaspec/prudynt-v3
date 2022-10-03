@@ -39,6 +39,7 @@ void MotionMP4Mux::mux(std::string ts, std::string timestr, std::string clip, st
         fclose(meta_file);
         return;
     }
+    std::this_thread::yield();
 
     oc->oformat->video_codec = AV_CODEC_ID_MPEG4;
     vs = avformat_new_stream(oc, NULL);
@@ -116,6 +117,7 @@ void MotionMP4Mux::mux(std::string ts, std::string timestr, std::string clip, st
             naldata.clear();
             av_packet_free(&pkt);
         }
+        std::this_thread::yield();
     }
     if (!found_iframe) {
         LOG_ERROR("Clip contains no iframe! Something went wrong.");
