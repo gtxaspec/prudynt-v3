@@ -13,10 +13,9 @@
 #include "GPIO.hpp"
 #include "Encoder.hpp"
 
-std::atomic<uint32_t> Encoder::sink_id(0);
-std::mutex Encoder::sinks_mod_lock;
-std::set<uint32_t> Encoder::sinks_reap_set;
-std::map<uint32_t,EncoderSink> Encoder::sinks_add_set;
+std::mutex Encoder::sinks_lock;
+std::map<uint32_t,EncoderSink> Encoder::sinks;
+uint32_t Encoder::sink_id = 0;
 
 Encoder::Encoder() {}
 
@@ -168,76 +167,48 @@ void Encoder::run() {
         encode_time.tv_sec  = nal_ts / 1000000;
         encode_time.tv_usec = nal_ts % 1000000;
 
-        std::vector<H264NALUnit> packs;
         for (unsigned int i = 0; i < stream.packCount; ++i) {
             uint8_t* start = (uint8_t*)stream.virAddr + stream.pack[i].offset;
             uint8_t* end = start + stream.pack[i].length;
 
             H264NALUnit nalu;
-            nalu.nal_type = stream.pack[i].nalType.h265NalType;
             nalu.imp_ts = stream.pack[i].timestamp;
             timeradd(&imp_time_base, &encode_time, &nalu.time);
             nalu.duration = 0;
-            if (nalu.nal_type == 19 ||
-                nalu.nal_type == 20 ||
-                nalu.nal_type == 1) {
+            if (stream.pack[i].nalType.h265NalType == 19 ||
+                stream.pack[i].nalType.h265NalType == 20 ||
+                stream.pack[i].nalType.h265NalType == 1) {
                 nalu.duration = last_nal_ts - nal_ts;
             }
             //We use start+4 because the encoder inserts 4-byte MPEG
             //'startcodes' at the beginning of each NAL. Live555 complains
             //if those are present.
             nalu.data.insert(nalu.data.end(), start+4, end);
-            packs.push_back(nalu);
-        }
-        osd.update();
-        IMP_Encoder_ReleaseStream(0, &stream);
 
-        //Send nalus to sinks
-        for (auto pit = packs.begin(); pit != packs.end(); ++pit) {
-            for (std::map<uint32_t,EncoderSink>::iterator it=sinks.begin();
-                 it != sinks.end(); ++it) {
-                if (pit->nal_type == 32 ||
-                    pit->nal_type == 33 ||
-                    pit->nal_type == 34 ||
-                    pit->nal_type == 19 ||
-                    pit->nal_type == 20) {
+            std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
+            for (std::map<uint32_t,EncoderSink>::iterator it=Encoder::sinks.begin();
+                 it != Encoder::sinks.end(); ++it) {
+                if (stream.pack[i].nalType.h265NalType == 32 ||
+                    stream.pack[i].nalType.h265NalType == 33 ||
+                    stream.pack[i].nalType.h265NalType == 34 ||
+                    stream.pack[i].nalType.h265NalType == 19 ||
+                    stream.pack[i].nalType.h265NalType == 20) {
                     it->second.IDR = true;
                 }
                 if (it->second.IDR) {
-                    while (!it->second.chn->write(*pit)) {
-                        //Some sinks can tolerate nalu loss.
-                        //Don't yield for these sinks.
-                        if (it->second.tolerate_loss) {
-                            break;
-                        }
-                        //Sink is clogged. Let it catch up by yielding.
-                        std::this_thread::yield();
-                        //Another thread could have deleted the sink, check.
-                        std::unique_lock<std::mutex> lck(Encoder::sinks_mod_lock);
-                        if (Encoder::sinks_reap_set.find(it->first) != Encoder::sinks_reap_set.end()) {
-                            LOG_INFO("Sink deleted during yield loop, break.");
-                            break;
-                        }
+                    if (!it->second.chn->write(nalu)) {
+                        //Discard old NALUs if our sinks aren't keeping up.
+                        //This prevents the MsgChannels from clogging up with
+                        //old data.
+                        LOG_WARN("Sink " << it->second.name << " clogged! Discarding NAL.");
+                        //H264NALUnit old_nal;
+                        //it->second.chn->read(&old_nal);
                     }
                 }
             }
         }
-
-        //Add requested sinks
-        Encoder::sinks_mod_lock.lock();
-        for (auto it = Encoder::sinks_add_set.begin();
-             it != Encoder::sinks_add_set.end(); ++it) {
-            sinks.insert(*it);
-        }
-        Encoder::sinks_add_set.clear();
-        //Delete sinks marked for removal
-        for (auto it = Encoder::sinks_reap_set.begin();
-             it != Encoder::sinks_reap_set.end(); ++it) {
-            sinks.erase(*it);
-        }
-        Encoder::sinks_reap_set.clear();
-        Encoder::sinks_mod_lock.unlock();
-
+        osd.update();
+        IMP_Encoder_ReleaseStream(0, &stream);
         last_nal_ts = nal_ts;
         std::this_thread::yield();
     }
