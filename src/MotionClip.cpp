@@ -34,6 +34,7 @@ MotionClip::MotionClip() {
     LOG_DEBUG("Writing to " << clip_path);
 
     clip_file = fopen(clip_path.c_str(), "w");
+    setvbuf(clip_file, NULL, _IOFBF, 10 * 1024 * 1024);
     if (clip_file == NULL) {
         LOG_ERROR("Could not open nal file");
         return;
