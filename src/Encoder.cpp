@@ -133,9 +133,9 @@ void Encoder::set_day_mode(DayMode mode) {
 void Encoder::run() {
     LOG_INFO("Encoder Start.");
 
-    //This is the most important thread in the process
-    //and likely the most important thread on the camera
-    nice(-20);
+    //The encoder thread is very important, but we
+    //want sink threads to have higher priority.
+    nice(-19);
 
     int64_t last_nal_ts = 0;
 

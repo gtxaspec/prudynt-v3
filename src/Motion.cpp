@@ -141,7 +141,7 @@ void Motion::prebuffer(H264NALUnit &nal) {
 
 void Motion::run() {
     LOG_INFO("Starting Motion Detector");
-    nice(-19);
+    nice(-20);
 
     sink_id = Encoder::connect_sink(this, "Motion");
     Motion::moving = false;

@@ -8,6 +8,7 @@
 
 void RTSP::run() {
     LOG_INFO("RUN");
+    nice(-20);
     TaskScheduler *scheduler = BasicTaskScheduler::createNew();
     UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
 
