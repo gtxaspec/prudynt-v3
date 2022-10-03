@@ -48,7 +48,7 @@ void Motion::detect() {
             Motion::indicator = false;
         }
 
-        ret = IMP_IVS_ReleaseResult(0, (void**)&result);
+        ret = IMP_IVS_ReleaseResult(0, (void*)result);
         if (ret < 0) {
             return;
         }
