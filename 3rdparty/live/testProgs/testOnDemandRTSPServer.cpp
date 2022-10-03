@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
-// Copyright (c) 1996-2021, Live Networks, Inc.  All rights reserved
+// Copyright (c) 1996-2022, Live Networks, Inc.  All rights reserved
 // A test program that demonstrates how to stream - via unicast RTP
 // - various kinds of file on demand, using a built-in RTSP server.
 // main program
@@ -67,11 +67,24 @@ int main(int argc, char** argv) {
 #endif
 
   // Create the RTSP server:
+#ifdef SERVER_USE_TLS
+  // Serve RTSPS: RTSP over a TLS connection:
+  RTSPServer* rtspServer = RTSPServer::createNew(*env, 322, authDB);
+#else
+  // Serve regular RTSP (over a TCP connection):
   RTSPServer* rtspServer = RTSPServer::createNew(*env, 8554, authDB);
+#endif
   if (rtspServer == NULL) {
     *env << "Failed to create RTSP server: " << env->getResultMsg() << "\n";
     exit(1);
   }
+#ifdef SERVER_USE_TLS
+#ifndef STREAM_USING_SRTP
+#define STREAM_USING_SRTP True
+#endif
+  rtspServer->setTLSState(PATHNAME_TO_CERTIFICATE_FILE, PATHNAME_TO_PRIVATE_KEY_FILE,
+			  STREAM_USING_SRTP);
+#endif
 
   char const* descriptionString
     = "Session streamed by \"testOnDemandRTSPServer\"";
@@ -433,10 +446,17 @@ int main(int argc, char** argv) {
   // Try first with the default HTTP port (80), and then with the alternative HTTP
   // port numbers (8000 and 8080).
 
+#ifdef SERVER_USE_TLS
+  // (Attempt to) use the default HTTPS port (443) instead:
+  char const* httpProtocolStr = "HTTPS";
+  if (rtspServer->setUpTunnelingOverHTTP(443)) {
+#else
+  char const* httpProtocolStr = "HTTP";
   if (rtspServer->setUpTunnelingOverHTTP(80) || rtspServer->setUpTunnelingOverHTTP(8000) || rtspServer->setUpTunnelingOverHTTP(8080)) {
-    *env << "\n(We use port " << rtspServer->httpServerPortNum() << " for optional RTSP-over-HTTP tunneling.)\n";
+#endif
+    *env << "\n(We use port " << rtspServer->httpServerPortNum() << " for optional RTSP-over-" << httpProtocolStr << " tunneling.)\n";
   } else {
-    *env << "\n(RTSP-over-HTTP tunneling is not available.)\n";
+    *env << "\n(RTSP-over-" << httpProtocolStr << " tunneling is not available.)\n";
   }
 
   env->taskScheduler().doEventLoop(); // does not return

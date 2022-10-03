@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
-// Copyright (c) 1996-2021, Live Networks, Inc.  All rights reserved
+// Copyright (c) 1996-2022, Live Networks, Inc.  All rights reserved
 // A common framework, used for the "openRTSP" and "playSIP" applications
 // Implementation
 //
@@ -77,6 +77,7 @@ Boolean outputAVIFile = False;
 AVIFileSink* aviOut = NULL;
 Boolean audioOnly = False;
 Boolean videoOnly = False;
+Boolean applicationOnly = False;
 char const* singleMedium = NULL;
 int verbosityLevel = 1; // by default, print verbose output
 double duration = 0;
@@ -232,6 +233,12 @@ int main(int argc, char** argv) {
     case 'v': { // receive/record a video stream only
       videoOnly = True;
       singleMedium = "video";
+      break;
+    }
+
+    case 'L': { // receive/record an 'application' (e.g., metadata) stream only
+      applicationOnly = True;
+      singleMedium = "application";
       break;
     }
 
@@ -573,6 +580,14 @@ int main(int argc, char** argv) {
   }
   if (audioOnly && videoOnly) {
     *env << "The -a and -v options cannot both be used!\n";
+    usage();
+  }
+  if (audioOnly && applicationOnly) {
+    *env << "The -a and -L options cannot both be used!\n";
+    usage();
+  }
+  if (videoOnly && applicationOnly) {
+    *env << "The -v and -L options cannot both be used!\n";
     usage();
   }
   if (sendOptionsRequestOnly && !sendOptionsRequest) {

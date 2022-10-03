@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2021 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
 // A generic SIP client
 // Implementation
 
@@ -596,11 +596,11 @@ unsigned SIPClient::getResponseCode() {
         while (numExtraBytesNeeded > 0) {
           char* ptr = &readBuf[bytesRead];
 	  unsigned bytesRead2;
-	  struct sockaddr_storage fromAddr;
+	  struct sockaddr_storage dummy; // not used
 	  Boolean readSuccess
 	    = fOurSocket->handleRead((unsigned char*)ptr,
 				     numExtraBytesNeeded,
-				     bytesRead2, fromAddr);
+				     bytesRead2, dummy);
           if (!readSuccess) break;
           ptr[bytesRead2] = '\0';
           if (fVerbosityLevel >= 1) {
@@ -928,11 +928,11 @@ unsigned SIPClient::getResponse(char*& responseBuffer,
   int bytesRead = 0;
   while (bytesRead < (int)responseBufferSize) {
     unsigned bytesReadNow;
-    struct sockaddr_storage fromAddr;
+    struct sockaddr_storage dummy; // not used
     unsigned char* toPosn = (unsigned char*)(responseBuffer+bytesRead);
     Boolean readSuccess
       = fOurSocket->handleRead(toPosn, responseBufferSize-bytesRead,
-			       bytesReadNow, fromAddr);
+			       bytesReadNow, dummy);
     if (!readSuccess || bytesReadNow == 0) {
       envir().setResultMsg("SIP response was truncated");
       break;

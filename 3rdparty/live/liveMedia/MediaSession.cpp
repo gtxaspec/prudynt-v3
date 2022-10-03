@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "liveMedia"
-// Copyright (c) 1996-2021 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
 // A data structure that represents a session that consists of
 // potentially multiple (audio and/or video) sub-sessions
 // Implementation
@@ -336,6 +336,7 @@ static MIKEYState* parseSDPAttribute_key_mgmtToMIKEY(char const* sdpLine) {
     if (keyMgmtData_decoded == NULL) break;
 
     resultMIKEYState = MIKEYState::createNew(keyMgmtData_decoded, keyMgmtData_decodedSize);
+    delete[] keyMgmtData_decoded;
   } while (0);
 
   delete[] keyMgmtPrtclId;

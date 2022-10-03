@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "groupsock"
-// Copyright (c) 1996-2021 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
 // IO event handlers
 // Implementation
 
@@ -35,10 +35,11 @@ static unsigned char ioBuffer[ioBufferSize];
 
 void socketReadHandler(Socket* sock, int /*mask*/) {
   unsigned bytesRead;
-  struct sockaddr_storage fromAddress;
+  struct sockaddr_storage dummy; // not used
   UsageEnvironment& saveEnv = sock->env();
       // because handleRead(), if it fails, may delete "sock"
-  if (!sock->handleRead(ioBuffer, ioBufferSize, bytesRead, fromAddress)) {
+
+  if (!sock->handleRead(ioBuffer, ioBufferSize, bytesRead, dummy)) {
     saveEnv.reportBackgroundError();
   }
 }

@@ -14,7 +14,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 **********/
 // "groupsock"
-// Copyright (c) 1996-2021 Live Networks, Inc.  All rights reserved.
+// Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
 // Network Addresses
 // Implementation
 
@@ -514,14 +514,5 @@ portNumBits portNum(struct sockaddr_storage const& address) {
 }
 
 void setPortNum(struct sockaddr_storage& address, portNumBits portNum/*in network order*/) {
-  switch (address.ss_family) {
-    case AF_INET: {
-      ((sockaddr_in&)address).sin_port = portNum;
-      break;
-    }
-    case AF_INET6: {
-      ((sockaddr_in6&)address).sin6_port = portNum;
-      break;
-    }
-  }
+  ((sockaddr_in&)address).sin_port = portNum; // position will be the same for "sockaddr_in6"
 }
