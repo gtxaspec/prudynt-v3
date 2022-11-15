@@ -2,7 +2,7 @@
 #include <cstring>
 #include "IMP.hpp"
 
-const int IMP::FRAME_RATE = 25;
+const int IMP::FRAME_RATE = 24;
 
 bool IMP::init() {
     int ret;
