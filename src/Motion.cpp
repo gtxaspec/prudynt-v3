@@ -154,34 +154,31 @@ void Motion::run() {
     H264NALUnit nal;
     while (true) {
         nal = encoder->wait_read();
-        prebuffer(nal);
-
         if (clip != nullptr) {
             clip->add_nal(nal);
         }
-        if (!Motion::moving && clip != nullptr) {
+        else {
+            prebuffer(nal);
+        }
+
+        if (!Motion::moving && clip != nullptr &&
+            ((nal.data[0] & 0x7E) >> 1) == 32) {
             //End of motion clip
             muxq_lq->write(clip);
             clip = nullptr;
+            //Seed the prebuffer with this nalu, a vps.
+            prebuffer(nal);
         }
         else if (Motion::moving && clip == nullptr) {
             //Start recording
             clip = MotionClip::begin();
             //Flush the prebuffer into the clip
-            auto last_idr = nalus.begin();
             for (auto it = nalus.begin(); it != nalus.end(); ++it) {
                 clip->add_nal(*it);
-                if ((((*it).data[0] & 0x7E) >> 1) == 32) {
-                    last_idr = it;
-                }
             }
-            //Clear all but the last IDR
-            if (vps.size() > 1) {
-                nalus.erase(nalus.begin(), last_idr);
-                H264NALUnit* last_vps = vps.back();
-                vps.clear();
-                vps.push_back(last_vps);
-            }
+            //Clear the prebuffer
+            nalus.clear();
+            vps.clear();
         }
 
 #if MOTION_STRICT_IDR
