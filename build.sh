@@ -8,7 +8,14 @@ rm -rf 3rdparty/install
 mkdir 3rdparty/install
 
 echo "Build OpenSSL"
-cd 3rdparty/openssl
+cd 3rdparty
+rm -rf openssl
+if [[ ! -f openssl-1.1.1g.tar.gz ]]; then
+    wget 'https://www.openssl.org/source/openssl-1.1.1g.tar.gz'
+fi
+tar xvf openssl-1.1.1g.tar.gz
+mv openssl-1.1.1g openssl
+cd openssl
 ./Configure linux-mips32 no-async --prefix="$TOP/3rdparty/install"
 make clean
 make -j$(nproc) CC="${PRUDYNT_CROSS}gcc"

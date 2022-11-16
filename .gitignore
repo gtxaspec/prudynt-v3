@@ -2,4 +2,7 @@ build/
 3rdparty/install
 3rdparty/freetype
 3rdparty/freetype*.tar.xz
-
+3rdparty/openssl
+3rdparty/openssl*.tar.gz
+3rdparty/ffmpeg
+3rdparty/ffmpeg*.tar.xz
