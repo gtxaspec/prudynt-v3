@@ -23,6 +23,9 @@ Config::Config() {
     lc.lookupValue("night.color", nightColor);
     lc.lookupValue("sun_track.latitude", sunTrackLatitude);
     lc.lookupValue("sun_track.longitude", sunTrackLongitude);
+    lc.lookupValue("rtsp.auth_required", rtspAuthRequired);
+    lc.lookupValue("rtsp.username", rtspUsername);
+    lc.lookupValue("rtsp.password", rtspPassword);
 
     if (!validateConfig()) {
         LOG_ERROR("Configuration is invalid, using defaults.");
@@ -39,6 +42,9 @@ void Config::loadDefaults() {
     nightMode = NIGHT_MODE_SUN_TRACK;
     sunTrackLatitude = 40.71;
     sunTrackLongitude = -74;
+    rtspAuthRequired = false;
+    rtspUsername = "";
+    rtspPassword = "";
 }
 
 bool Config::validateConfig() {

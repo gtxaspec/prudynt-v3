@@ -22,6 +22,9 @@ public:
     NightMode nightMode;
     double sunTrackLatitude;
     double sunTrackLongitude;
+    std::string rtspUsername;
+    std::string rtspPassword;
+    bool rtspAuthRequired;
 private:
     static Config* instance;
 };

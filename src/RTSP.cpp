@@ -3,6 +3,7 @@
 #include "BasicUsageEnvironment.hh"
 #include "IMPServerMediaSubsession.hpp"
 #include "IMPDeviceSource.hpp"
+#include "Config.hpp"
 
 #define MODULE "RTSP"
 
@@ -12,7 +13,18 @@ void RTSP::run() {
     TaskScheduler *scheduler = BasicTaskScheduler::createNew();
     UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
 
-    RTSPServer *rtspServer = RTSPServer::createNew(*env, 8554, NULL);
+    RTSPServer *rtspServer;
+    if (Config::singleton()->rtspAuthRequired) {
+        UserAuthenticationDatabase *auth = new UserAuthenticationDatabase;
+        auth->addUserRecord(
+            Config::singleton()->rtspUsername.c_str(),
+            Config::singleton()->rtspPassword.c_str()
+        );
+        rtspServer = RTSPServer::createNew(*env, 8554, auth);
+    }
+    else {
+        rtspServer = RTSPServer::createNew(*env, 8554);
+    }
     if (rtspServer == NULL) {
         LOG_ERROR("Failed to create RTSP server: " << env->getResultMsg() << "\n");
         return;
