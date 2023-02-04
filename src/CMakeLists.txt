@@ -48,4 +48,5 @@ target_link_libraries(${PROJECT_NAME}
   swresample
   swscale
   avutil
+  config++
 )

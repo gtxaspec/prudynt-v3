@@ -50,6 +50,20 @@ make -j$(nproc)
 make install
 cd ../../
 
+echo "Build libconfig"
+cd 3rdparty
+rm -rf libconfig
+if [[ ! -f libconfig-1.7.3.tar.gz ]]; then
+    wget 'https://hyperrealm.github.io/libconfig/dist/libconfig-1.7.3.tar.gz';
+fi
+tar xvf libconfig-1.7.3.tar.gz
+mv libconfig-1.7.3 libconfig
+cd libconfig
+CC="${PRUDYNT_CROSS}gcc" CXX="${PRUDYNT_CROSS}g++" ./configure --host mipsel-linux-gnu --prefix="$TOP/3rdparty/install"
+make -j$(nproc)
+make install
+cd ../../
+
 echo "Build live555"
 cd 3rdparty/live
 if [[ -f Makefile ]]; then
