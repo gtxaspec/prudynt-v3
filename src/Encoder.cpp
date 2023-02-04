@@ -73,8 +73,7 @@ int Encoder::system_init() {
     int ret = 0;
 
     IMP_ISP_Tuning_SetAntiFlickerAttr(IMPISP_ANTIFLICKER_60HZ);
-
-    set_day_mode(DAY_MODE_DAY);
+    night.init();
 
     return ret;
 }
@@ -106,28 +105,6 @@ int Encoder::encoder_init() {
     }
 
     return ret;
-}
-
-void Encoder::set_day_mode(DayMode mode) {
-    day_mode = mode;
-    if (day_mode == DAY_MODE_DAY) {
-        //Day mode sensor settings
-        IMP_ISP_Tuning_SetISPRunningMode(IMPISP_RUNNING_MODE_DAY);
-
-        //This may benefit from additional tuning
-        //I found that 180 produces too much ghosting.
-        //135 looks acceptable to my eye.
-        IMP_ISP_Tuning_SetTemperStrength(135);
-
-        //Enable IR filter
-        GPIO::write(53, 0);
-        GPIO::write(52, 1);
-        ir_leds_on = false;
-    }
-    else {
-        //Night mode settings
-        ir_leds_on = false;
-    }
 }
 
 void Encoder::run() {
@@ -208,6 +185,7 @@ void Encoder::run() {
             }
         }
         osd.update();
+        night.update();
         IMP_Encoder_ReleaseStream(0, &stream);
         last_nal_ts = nal_ts;
         std::this_thread::yield();

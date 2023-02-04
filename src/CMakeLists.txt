@@ -15,6 +15,9 @@ set(WYZEDOM_SOURCE
   CVR.cpp
   Scripts.cpp
   MuxQueue.cpp
+  Config.cpp
+  Night.cpp
+  SunTrack.cpp
 )
 
 add_executable(${PROJECT_NAME} ${WYZEDOM_SOURCE})

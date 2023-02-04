@@ -12,6 +12,7 @@
 #include "MsgChannel.hpp"
 #include "Logger.hpp"
 #include "OSD.hpp"
+#include "Night.hpp"
 
 struct H264NALUnit {
     std::vector<uint8_t> data;
@@ -54,22 +55,12 @@ public:
     }
 
 private:
-    enum DayMode {
-        DAY_MODE_DAY,
-        DAY_MODE_NIGHT
-    };
-
     OSD osd;
-
-    DayMode day_mode;
-    int day_mode_change = 0;
-    time_t last_mode_change = 0;
-    bool ir_leds_on = false;
+    Night night;
 
     int system_init();
     int framesource_init();
     int encoder_init();
-    void set_day_mode(DayMode mode);
     static std::mutex sinks_lock;
     static uint32_t sink_id;
     static std::map<uint32_t, EncoderSink> sinks;
