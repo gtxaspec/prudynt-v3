@@ -6,7 +6,7 @@
 
 class MuxQueue {
 public:
-    MuxQueue() {};
+    MuxQueue();
     void run();
 
     void set_clip_source(std::shared_ptr<ListQueue<MotionClip*>> chn) {
@@ -14,6 +14,7 @@ public:
     }
 private:
     std::shared_ptr<ListQueue<MotionClip*>> clip_source;
+    time_t queue_stats_time;
 };
 
 #endif

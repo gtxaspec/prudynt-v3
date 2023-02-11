@@ -6,6 +6,10 @@ extern "C" {
 
 #define MODULE "MUX_QUEUE"
 
+MuxQueue::MuxQueue() {
+    queue_stats_time = time(NULL);
+}
+
 void MuxQueue::run() {
     MotionClip *mq;
 
@@ -16,6 +20,13 @@ void MuxQueue::run() {
     nice(19);
 
     while (true) {
+        //Print queue statistics every 3 minutes
+        time_t now = time(NULL);
+        if (now - queue_stats_time > 3*60) {
+            LOG_INFO("MuxQueue size: " << clip_source->queue_size());
+            queue_stats_time = now;
+        }
+
         mq = clip_source->wait_read();
         mq->write();
         delete mq;
