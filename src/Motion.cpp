@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Motion.hpp"
+#include "Config.hpp"
 
 extern "C" {
     #include <unistd.h>
@@ -41,7 +42,7 @@ void Motion::detect() {
         }
         else {
             timersub(&now, &move_time, &diff);
-            if (Motion::moving && diff.tv_sec >= MOTION_POST_TIME) {
+            if (Motion::moving && diff.tv_sec >= Config::singleton()->motionPostTime) {
                 LOG_INFO("End of Motion");
                 Motion::moving = false;
             }
@@ -122,7 +123,7 @@ void Motion::prebuffer(H264NALUnit &nal) {
         gettimeofday(&now, NULL);
         for (auto it = vps.begin(); it != vps.end(); ++it) {
             timersub(&now, &(*it)->time, &diff);
-            if (diff.tv_sec >= MOTION_PRE_TIME) {
+            if (diff.tv_sec >= Config::singleton()->motionPreTime) {
                 ++del;
             }
         }
@@ -181,13 +182,13 @@ void Motion::run() {
             vps.clear();
         }
 
-#if MOTION_STRICT_IDR
-        time_t cur = time(NULL);
-        if (cur != last_time) {
-            Encoder::flush();
-            last_time = cur;
+        if (Config::singleton()->motionStrictIDR) {
+            time_t cur = time(NULL);
+            if (cur != last_time) {
+                Encoder::flush();
+                last_time = cur;
+            }
         }
-#endif
 
         std::this_thread::yield();
     }

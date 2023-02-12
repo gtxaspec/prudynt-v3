@@ -12,20 +12,6 @@
 #include "MuxQueue.hpp"
 #include "ListQueue.hpp"
 
-//Maintain a prerecord buffer of (at least) this
-//many seconds. When a motion event occurs, the
-//prerecord buffer is written to the clip file.
-#define MOTION_PRE_TIME 5
-
-//When motion has ceased, wait this many seconds
-//before we stop recording.
-#define MOTION_POST_TIME 5
-
-//If true, force the encoder to create IDRs every
-//second, thus ensuring the prerecord buffer's
-//duration is exactly MOTION_PRE_TIME seconds.
-#define MOTION_STRICT_IDR 0
-
 class Motion {
 public:
     void run();
@@ -60,10 +46,7 @@ private:
     std::list<H264NALUnit*> vps;
     std::shared_ptr<MsgChannel<H264NALUnit>> encoder;
     uint32_t sink_id;
-
-#if MOTION_STRICT_IDR
     time_t last_time;
-#endif
 };
 
 #endif
