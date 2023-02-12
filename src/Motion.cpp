@@ -16,6 +16,7 @@ void Motion::mux_queue_start(MuxQueue mq) { mq.run(); }
 void Motion::detect() {
     LOG_INFO("Detection thread started");
     int ret;
+    int debounce = 0;
     IMP_IVS_MoveOutput *result;
     while (true) {
         ret = IMP_IVS_PollingResult(0, IMP_IVS_DEFAULT_TIMEOUTMS);
@@ -33,14 +34,18 @@ void Motion::detect() {
         struct timeval now, diff;
         gettimeofday(&now, NULL);
         if (result->retRoi[0]) {
-            if (!Motion::moving) {
-                LOG_INFO("Motion Start");
-                Motion::moving = true;
+            ++debounce;
+            if (debounce >= Config::singleton()->motionDebounce) {
+                if (!Motion::moving) {
+                    LOG_INFO("Motion Start: " << result->retRoi[0]);
+                    Motion::moving = true;
+                }
+                Motion::indicator = true;
             }
             gettimeofday(&move_time, NULL);
-            Motion::indicator = true;
         }
         else {
+            debounce = 0;
             timersub(&now, &move_time, &diff);
             if (Motion::moving && diff.tv_sec >= Config::singleton()->motionPostTime) {
                 LOG_INFO("End of Motion");
