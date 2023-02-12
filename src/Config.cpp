@@ -26,6 +26,12 @@ Config::Config() {
     lc.lookupValue("rtsp.auth_required", rtspAuthRequired);
     lc.lookupValue("rtsp.username", rtspUsername);
     lc.lookupValue("rtsp.password", rtspPassword);
+    lc.lookupValue("motion.enabled", motionEnabled);
+    lc.lookupValue("motion.pre_time", motionPreTime);
+    lc.lookupValue("motion.post_time", motionPostTime);
+    lc.lookupValue("motion.sensitivity", motionSensitivity);
+    lc.lookupValue("motion.debounce", motionDebounce);
+    lc.lookupValue("motion.strict_idr", motionStrictIDR);
 
     if (!validateConfig()) {
         LOG_ERROR("Configuration is invalid, using defaults.");
@@ -45,6 +51,12 @@ void Config::loadDefaults() {
     rtspAuthRequired = false;
     rtspUsername = "";
     rtspPassword = "";
+    motionEnabled = true;
+    motionPreTime = 5;
+    motionPostTime = 5;
+    motionSensitivity = 2;
+    motionDebounce = 3;
+    motionStrictIDR = false;
 }
 
 bool Config::validateConfig() {
@@ -58,6 +70,22 @@ bool Config::validateConfig() {
     }
     if (sunTrackLongitude < -180 || sunTrackLatitude > 180) {
         LOG_ERROR("Sun track longitude out of range.");
+        return false;
+    }
+    if (motionSensitivity < 0 || motionSensitivity > 4) {
+        LOG_ERROR("Motion sensitivity out of range.");
+        return false;
+    }
+    if (motionPreTime < 0) {
+        LOG_ERROR("Motion prebuffer time out of range.");
+        return false;
+    }
+    if (motionPostTime < 0) {
+        LOG_ERROR("Motion postbuffer time out of range.");
+        return false;
+    }
+    if (motionDebounce < 1) {
+        LOG_ERROR("Motion debounce must be at least one frame");
         return false;
     }
     return true;

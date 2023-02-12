@@ -25,6 +25,12 @@ public:
     std::string rtspUsername;
     std::string rtspPassword;
     bool rtspAuthRequired;
+    bool motionEnabled;
+    int motionPreTime;
+    int motionPostTime;
+    int motionSensitivity;
+    int motionDebounce;
+    bool motionStrictIDR;
 private:
     static Config* instance;
 };
