@@ -1,0 +1,73 @@
+# RTSP settings
+rtsp: {
+    # If true, the RTSP server will demand authentication
+    # with the below credentials.
+    auth_required: true;
+
+    # Credentials for the RTSP server
+    username: "wyze";
+    password: "wyzertsp";
+};
+
+# Night detection and night mode settings
+night: {
+    # Whether to enable night detection. Disable this if
+    # you never want your camera to switch to night mode.
+    enabled: true;
+
+    # Which night detection system to use.
+    # Currently, the only supported value is "sun_track"
+    mode: "sun_track";
+
+    # Whether to use IR LEDs when the camera is in night
+    # mode. If your camera looks out a window, you probably
+    # want to disable this.
+    infrared: true;
+
+    # Whether to enable color at night. If false, the
+    # camera will switch to black and white mode.
+    color: false;
+};
+
+# Sunrise/Sunset night detection.
+# With this night detection system, the camera switches
+# to night mode after sunset, and switches back to day
+# mode after sunrise. These settings are only used if
+# the night mode is "sun_track".
+sun_track: {
+    # Coordinates of the camera. Used to calculate
+    # the time of sunrise and sunset.
+    latitude: 40.03;
+    longitude: -76.28;
+};
+
+# Motion detection settings
+motion: {
+    # Enable or disable the motion detection subsystem.
+    enabled: true;
+
+    # Maintain a prerecord buffer of (at least) this
+    # many seconds. When a motion event occurs, the
+    # prerecord buffer is written to the clip file to
+    # provide context for the motion event.
+    pre_time: 5;
+
+    # When motion has ceased, wait this many seconds
+    # before we stop recording.
+    post_time: 5;
+
+    # Motion detection sensitivity. Range 0-4
+    sensitivity: 2;
+    
+    # Debounce: How many sequential frames must indicate
+    # motion before we start recording. Set to one if you
+    # want to capture single-frame motion events.
+    debounce: 3;
+
+    # If true, force the encoder to create IDRs every
+    # second, thus ensuring the prerecord buffer's
+    # duration is exactly the duration set in pre_time.
+    # Setting this to true will increase the storage size
+    # of recorded content and may degrade stream performance.
+    strict_idr: false;
+};
