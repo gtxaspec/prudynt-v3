@@ -6,3 +6,5 @@ build/
 3rdparty/openssl*.tar.gz
 3rdparty/ffmpeg
 3rdparty/ffmpeg*.tar.xz
+3rdparty/libconfig
+3rdparty/libconfig*.tar.gz
