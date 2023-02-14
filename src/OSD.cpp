@@ -135,15 +135,9 @@ void OSD::set_text(OSDTextItem *ti, std::string text) {
     ti->text = text;
 
     //First, calculate the size of the bitmap surface we need
-    int item_width = 0, item_height = 0;
     FT_BBox total_bbox = {0,0,0,0};
     for (unsigned int i = 0; i < ti->text.length(); ++i) {
         FT_BBox bbox = boxes[ti->text[i]];
-
-        if (i+1 == ti->text.length())
-            item_width += bbox.xMax - bbox.xMin;
-        else
-            item_width += advances[ti->text[i]].x >> 16;
 
         if (bbox.yMin < total_bbox.yMin)
             total_bbox.yMin = bbox.yMin;
@@ -151,10 +145,10 @@ void OSD::set_text(OSDTextItem *ti, std::string text) {
             total_bbox.yMax = bbox.yMax;
         if (bbox.xMin < total_bbox.xMin)
             total_bbox.xMin = bbox.xMin;
-        if (bbox.xMax > total_bbox.xMax)
-            total_bbox.xMax = bbox.xMax;
+        total_bbox.xMax += advances[ti->text[i]].x >> 16;
     }
-    item_height = total_bbox.yMax - total_bbox.yMin + 1;
+    int item_height = total_bbox.yMax - total_bbox.yMin + 1;
+    int item_width = total_bbox.xMax - total_bbox.xMin + 1;
 
     int pen_y = -total_bbox.yMin;
     int pen_x = -total_bbox.xMin;
