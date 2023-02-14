@@ -25,11 +25,11 @@ cd ../../
 echo "Build freetype2"
 cd 3rdparty
 rm -rf freetype
-if [[ ! -f freetype-2.10.4.tar.xz ]]; then
-    wget 'https://download.savannah.gnu.org/releases/freetype/freetype-2.10.4.tar.xz'
+if [[ ! -f freetype-2.13.0.tar.xz ]]; then
+    wget 'https://download.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.xz'
 fi
-tar xvf freetype-2.10.4.tar.xz
-mv freetype-2.10.4 freetype
+tar xvf freetype-2.13.0.tar.xz
+mv freetype-2.13.0 freetype
 cd freetype
 CC="${PRUDYNT_CROSS}gcc" ./configure --host mipsel-linux-gnu --prefix="$TOP/3rdparty/install/" --with-png=no --with-brotli=no --with-harfbuzz=no --with-zlib=no
 make -j$(nproc)
