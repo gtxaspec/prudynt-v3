@@ -5,6 +5,7 @@
 #include "Scripts.hpp"
 
 extern "C" {
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/timestamp.h>
 #include <libavutil/log.h>
@@ -41,7 +42,6 @@ void MotionMP4Mux::mux(std::string ts, std::string timestr, std::string clip, st
     }
     std::this_thread::yield();
 
-    oc->oformat->video_codec = AV_CODEC_ID_MPEG4;
     vs = avformat_new_stream(oc, NULL);
     vs->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     vs->codecpar->codec_id = AV_CODEC_ID_H265;

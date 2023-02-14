@@ -39,11 +39,11 @@ cd ../../
 echo "Build ffmpeg"
 cd 3rdparty
 rm -rf ffmpeg
-if [[ ! -f ffmpeg-4.4.1.tar.xz ]]; then
-    wget 'https://web.archive.org/web/20220429132854if_/https://ffmpeg.org/releases/ffmpeg-4.4.1.tar.xz'
+if [[ ! -f ffmpeg-5.1.2.tar.xz ]]; then
+    wget 'https://ffmpeg.org/releases/ffmpeg-5.1.2.tar.xz'
 fi
-tar xvf ffmpeg-4.4.1.tar.xz
-mv ffmpeg-4.4.1 ffmpeg
+tar xvf ffmpeg-5.1.2.tar.xz
+mv ffmpeg-5.1.2 ffmpeg
 cd ffmpeg
 ./configure --disable-zlib --target-os=linux --disable-loongson3 --disable-mipsfpu --arch=mipsel --cc="${PRUDYNT_CROSS}gcc" --cxx="${PRUDYNT_CROSS}g++" --strip="${PRUDYNT_CROSS}strip" --prefix="$TOP/3rdparty/install" --enable-gpl --enable-cross-compile --extra-libs=-latomic --enable-version3
 make -j$(nproc)

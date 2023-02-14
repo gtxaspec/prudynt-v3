@@ -5,6 +5,7 @@
 #include "Scripts.hpp"
 
 extern "C" {
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/timestamp.h>
 #include <libavutil/log.h>
@@ -40,7 +41,6 @@ void MotionTSMux::mux(std::string ts, std::string timestr, std::string clip, std
         return;
     }
 
-    oc->oformat->video_codec = AV_CODEC_ID_H265;
     vs = avformat_new_stream(oc, NULL);
     vs->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     vs->codecpar->codec_id = AV_CODEC_ID_H265;
