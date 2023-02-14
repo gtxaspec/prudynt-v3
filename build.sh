@@ -45,7 +45,7 @@ fi
 tar xvf ffmpeg-5.1.2.tar.xz
 mv ffmpeg-5.1.2 ffmpeg
 cd ffmpeg
-./configure --disable-zlib --target-os=linux --disable-loongson3 --disable-mipsfpu --arch=mipsel --cc="${PRUDYNT_CROSS}gcc" --cxx="${PRUDYNT_CROSS}g++" --strip="${PRUDYNT_CROSS}strip" --prefix="$TOP/3rdparty/install" --enable-gpl --enable-cross-compile --extra-libs=-latomic --enable-version3
+./configure --disable-zlib --target-os=linux --arch=mipsel --cpu=mips32r2 --disable-msa --cc="${PRUDYNT_CROSS}gcc" --cxx="${PRUDYNT_CROSS}g++" --strip="${PRUDYNT_CROSS}strip" --prefix="$TOP/3rdparty/install" --enable-gpl --enable-cross-compile --extra-libs=-latomic --enable-version3
 make -j$(nproc)
 make install
 cd ../../
