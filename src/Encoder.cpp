@@ -165,11 +165,7 @@ void Encoder::run() {
             std::unique_lock<std::mutex> lck(Encoder::sinks_lock);
             for (std::map<uint32_t,EncoderSink>::iterator it=Encoder::sinks.begin();
                  it != Encoder::sinks.end(); ++it) {
-                if (stream.pack[i].nalType.h265NalType == 32 ||
-                    stream.pack[i].nalType.h265NalType == 33 ||
-                    stream.pack[i].nalType.h265NalType == 34 ||
-                    stream.pack[i].nalType.h265NalType == 19 ||
-                    stream.pack[i].nalType.h265NalType == 20) {
+                if (stream.pack[i].nalType.h265NalType == 32) {
                     it->second.IDR = true;
                 }
                 if (it->second.IDR) {
