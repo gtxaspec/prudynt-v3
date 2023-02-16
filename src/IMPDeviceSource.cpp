@@ -10,7 +10,7 @@ IMPDeviceSource::IMPDeviceSource(UsageEnvironment& env)
     : FramedSource(env)
 {
     LOG_DEBUG("Device source construct");
-    sink_id = Encoder::connect_sink(this, "IMPDeviceSource", true);
+    sink_id = Encoder::connect_sink(this, "IMPDeviceSource");
 }
 
 IMPDeviceSource::~IMPDeviceSource() {
