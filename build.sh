@@ -26,7 +26,7 @@ echo "Build freetype2"
 cd 3rdparty
 rm -rf freetype
 if [[ ! -f freetype-2.13.0.tar.xz ]]; then
-    wget 'https://download.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.xz'
+    wget 'https://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.xz'
 fi
 tar xvf freetype-2.13.0.tar.xz
 mv freetype-2.13.0 freetype
