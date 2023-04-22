@@ -73,11 +73,17 @@ int main(int argc, const char *argv[]) {
     if (Config::singleton()->motionEnabled) {
         motion_thread = std::thread(start_component<Motion>, motion);
     }
+    if (Config::singleton()->cvrEnabled) {
+        cvr_thread = std::thread(start_component<CVR>, cvr);
+    }
 
     enc_thread.join();
     rtsp_thread.join();
     if (Config::singleton()->motionEnabled) {
         motion_thread.join();
+    }
+    if (Config::singleton()->cvrEnabled) {
+        cvr_thread.join();
     }
     return 0;
 }
