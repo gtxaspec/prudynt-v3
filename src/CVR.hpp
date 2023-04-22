@@ -12,7 +12,7 @@ public:
         encoder = chn;
     }
 private:
-    std::string get_cvr_path();
+    std::string get_cvr_path(time_t t, std::string ext);
 private:
     std::shared_ptr<MsgChannel<H264NALUnit>> encoder;
     uint32_t sink_id;
