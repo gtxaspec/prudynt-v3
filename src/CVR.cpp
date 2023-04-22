@@ -1,5 +1,6 @@
 #include "CVR.hpp"
 #include "MotionClip.hpp"
+#include "Config.hpp"
 
 extern "C" {
     #include <unistd.h>
@@ -40,7 +41,7 @@ void CVR::run() {
         meta.size = htole32(nal.data.size() + 4);
         meta.imp_ts = htole64(nal.imp_ts);
         //Write metadata to meta file
-        meta_stream.write((uint8_t*)&meta, sizeof(NalMetadata));
+        meta_stream.write((char*)&meta, sizeof(NalMetadata));
         if (!meta_stream.good()) {
             LOG_ERROR("Failed to write NALU metadata");
             cvr_stream.close();
