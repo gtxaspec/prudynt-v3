@@ -29,7 +29,7 @@ void CVR::run() {
             std::string path = get_cvr_path(now, ".h265");
             std::string meta_path = get_cvr_path(now, ".meta");
             cvr_stream.open(path);
-            meta_stream.open(path);
+            meta_stream.open(meta_path);
             if (!cvr_stream.good() || !meta_stream.good()) {
                 LOG_ERROR("Failed to open CVR output file(s)");
                 return;
