@@ -32,6 +32,8 @@ Config::Config() {
     lc.lookupValue("motion.sensitivity", motionSensitivity);
     lc.lookupValue("motion.debounce", motionDebounce);
     lc.lookupValue("motion.strict_idr", motionStrictIDR);
+    lc.lookupValue("cvr.enabled", cvrEnabled);
+    lc.lookupValue("cvr.rotate_time", cvrRotateTime);
 
     if (!validateConfig()) {
         LOG_ERROR("Configuration is invalid, using defaults.");
@@ -57,6 +59,8 @@ void Config::loadDefaults() {
     motionSensitivity = 2;
     motionDebounce = 3;
     motionStrictIDR = false;
+    cvrEnabled = false;
+    cvrRotateTime = 3600;
 }
 
 bool Config::validateConfig() {
@@ -86,6 +90,10 @@ bool Config::validateConfig() {
     }
     if (motionDebounce < 1) {
         LOG_ERROR("Motion debounce must be at least one frame");
+        return false;
+    }
+    if (cvrRotateTime <= 60) {
+        LOG_ERROR("CVR rotation time out of range.");
         return false;
     }
     return true;

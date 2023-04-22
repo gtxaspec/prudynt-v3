@@ -71,3 +71,13 @@ motion: {
     # of recorded content and may degrade stream performance.
     strict_idr: false;
 };
+
+# Continuous Video Recording
+cvr: {
+    # Enable or disable the CVR subsystem.
+    enabled: false;
+
+    # How often, in seconds, the CVR subsystem should
+    # rotate files. The minimum is 60 seconds.
+    rotate_time: 3600;
+};

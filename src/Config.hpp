@@ -31,6 +31,8 @@ public:
     int motionSensitivity;
     int motionDebounce;
     bool motionStrictIDR;
+    bool cvrEnabled;
+    int cvrRotateTime;
 private:
     static Config* instance;
 };
