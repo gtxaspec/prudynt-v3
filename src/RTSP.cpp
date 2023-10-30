@@ -58,7 +58,7 @@ void RTSP::run() {
     LOG_INFO("Got VPS, PPS, & SPS.");
 
     ServerMediaSession *sms = ServerMediaSession::createNew(
-        *env, "unicast", "Main", "Wyzecam"
+        *env, "unicast", "Main", Config::singleton()->rtspName.c_str()
     );
     IMPServerMediaSubsession *sub = IMPServerMediaSubsession::createNew(
         *env, vps, sps, pps

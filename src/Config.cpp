@@ -26,6 +26,7 @@ Config::Config() {
     lc.lookupValue("rtsp.auth_required", rtspAuthRequired);
     lc.lookupValue("rtsp.username", rtspUsername);
     lc.lookupValue("rtsp.password", rtspPassword);
+    lc.lookupValue("rtsp.name", rtspName);
     lc.lookupValue("motion.enabled", motionEnabled);
     lc.lookupValue("motion.pre_time", motionPreTime);
     lc.lookupValue("motion.post_time", motionPostTime);
@@ -53,6 +54,7 @@ void Config::loadDefaults() {
     rtspAuthRequired = false;
     rtspUsername = "";
     rtspPassword = "";
+    rtspName = "Wyzecam";
     motionEnabled = true;
     motionPreTime = 5;
     motionPostTime = 5;

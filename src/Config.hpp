@@ -24,6 +24,7 @@ public:
     double sunTrackLongitude;
     std::string rtspUsername;
     std::string rtspPassword;
+    std::string rtspName;
     bool rtspAuthRequired;
     bool motionEnabled;
     int motionPreTime;
