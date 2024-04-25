@@ -272,7 +272,7 @@ char* ServerMediaSession::generateSDPDescription(int addressFamily) {
 
     char const* const sdpPrefixFmt =
       "v=0\r\n"
-      "o=- %ld%06ld %d IN %s %s\r\n"
+      "o=- %lld%06lld %d IN %s %s\r\n"
       "s=%s\r\n"
       "i=%s\r\n"
       "t=0 0\r\n"
@@ -300,7 +300,7 @@ char* ServerMediaSession::generateSDPDescription(int addressFamily) {
 
     // Generate the SDP prefix (session-level lines):
     snprintf(sdp, sdpLength, sdpPrefixFmt,
-	     fCreationTime.tv_sec, fCreationTime.tv_usec, // o= <session id>
+             (long long)fCreationTime.tv_sec, (long long)fCreationTime.tv_usec, // o= <session id>
 	     1, // o= <version> // (needs to change if params are modified)
 	     addressFamily == AF_INET ? "IP4" : "IP6", // o= <address family>
 	     ipAddressStr.val(), // o= <address>
