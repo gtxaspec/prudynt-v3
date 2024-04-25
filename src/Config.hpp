@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <endian.h>
 
 enum NightMode {
     NIGHT_MODE_SUN_TRACK

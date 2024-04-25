@@ -4,6 +4,7 @@
 #include <imp/imp_framesource.h>
 #include <imp/imp_system.h>
 #include <imp/imp_isp.h>
+#include <endian.h>
 
 class IMP {
 public:
