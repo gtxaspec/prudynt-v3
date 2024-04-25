@@ -5,7 +5,7 @@ CCACHE = ccache
 CFLAGS = -Wall -Wextra -Wno-unused-parameter -O2 -DNO_OPENSSL=1
 CXXFLAGS = $(CFLAGS) -std=c++20
 LDFLAGS = -lrt
-LIBS = -lmuslshim -limp -lalog -lsysutils -lfreetype -lssl -lcrypto -lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment -lconfig++ \
+LIBS = -lmuslshim -limp -lalog -lfreetype -lssl -lcrypto -lliveMedia -lgroupsock -lBasicUsageEnvironment -lUsageEnvironment -lconfig++ \
 -lavutil -lavformat -lavfilter -lavcodec -lavdevice -lavutil -lswresample -latomic #-lswresample -lswscale -lavcodec -lavfilter -lavformat -lavdevice -lpostproc
 
 LIBIMP_INC_DIR = ./blob/include/T31

@@ -8,3 +8,4 @@ build/
 3rdparty/ffmpeg*.tar.xz
 3rdparty/libconfig
 3rdparty/libconfig*.tar.gz
+3rdparty/ingenic-musl
